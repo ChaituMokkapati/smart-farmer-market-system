@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Farmer Market</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/fonts/fonts.css') }}">
+    <script src="{{ url_for('static', filename='vendor/tailwind/tailwindcss.js') }}"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        soil: "#1f3a2d",
+                        leaf: "#3f7d48",
+                        grain: "#d7a44a",
+                        mist: "#eef4ec",
+                        ink: "#102116",
+                        sage: "#d9e8d5",
+                        clay: "#8a5c3d"
+                    },
+                    fontFamily: {
+                        display: ["Fraunces", "serif"],
+                        body: ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    boxShadow: {
+                        bloom: "0 24px 80px rgba(17, 40, 24, 0.12)",
+                        soft: "0 18px 36px rgba(17, 40, 24, 0.08)"
+                    }
+                }
+            }
+        };
+    </script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/fontawesome/css/all.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body class="font-body text-ink">
+    {% set is_admin_command = request.endpoint == 'admin_dashboard' %}
+    <div class="page-noise"></div>
+    <div class="page-radial page-radial-a"></div>
+    <div class="page-radial page-radial-b"></div>
+
+    {% if not is_admin_command %}
+    <header class="sticky top-0 z-40 border-b border-white/50 bg-white/80 backdrop-blur-xl">
+        <nav class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+            <a href="{{ url_for('index') }}" class="flex items-center gap-3">
+                <span
+                    class="flex h-11 w-11 items-center justify-center rounded-[1.15rem] bg-gradient-to-br from-soil via-leaf to-grain text-white shadow-soft">
+                    <i class="fa-solid fa-seedling"></i>
+                </span>
+                <span>
+                    <span class="block font-display text-[1.15rem] font-bold tracking-tight text-soil">Smart Farmer</span>
+                    <span class="block text-[0.65rem] font-bold uppercase tracking-[0.32em] text-leaf/70">Soil to
+                        table network</span>
+                </span>
+            </a>
+
+            <button type="button" data-mobile-toggle data-target="primary-menu"
+                class="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-soil/10 bg-white text-soil shadow-sm transition hover:border-leaf/30 hover:text-leaf lg:hidden">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
+            <div id="primary-menu"
+                class="mobile-menu hidden lg:flex lg:items-center lg:gap-4">
+                <div class="flex flex-col gap-2 rounded-[1.45rem] border border-soil/10 bg-white/95 p-4 shadow-bloom lg:flex-row lg:items-center lg:rounded-full lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none">
+                    <a href="{{ url_for('index') }}" class="nav-link">Home</a>
+                    {% if session.get('user_id') %}
+                    {% if session.get('role') == 'farmer' %}
+                    <a href="{{ url_for('farmer_dashboard') }}" class="nav-link">Farmer Workspace</a>
+                    {% elif session.get('role') == 'customer' %}
+                    <a href="{{ url_for('marketplace') }}" class="nav-link">Marketplace</a>
+                    <a href="{{ url_for('my_orders') }}" class="nav-link">Orders</a>
+                    {% elif session.get('role') == 'admin' %}
+                    <a href="{{ url_for('admin_dashboard') }}" class="nav-link">Admin Console</a>
+                    {% endif %}
+                    <a href="{{ url_for('logout') }}" class="btn-outline-app">Logout</a>
+                    {% else %}
+                    <a href="{{ url_for('login') }}" class="nav-link">Login</a>
+                    <a href="{{ url_for('register') }}" class="btn-outline-app">Join</a>
+                    <a href="{{ url_for('admin_login') }}" class="btn-primary-app">Admin Access</a>
+                    {% endif %}
+                </div>
+            </div>
+        </nav>
+    </header>
+    {% endif %}
+
+    <div class="flash-stack pointer-events-none fixed left-4 right-4 top-24 z-50 flex flex-col gap-3 md:left-auto md:right-6 md:top-28 md:w-[24rem]">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="flash-card reveal is-visible" data-flash>
+            <div class="flash-accent flash-{{ category }}"></div>
+            <div class="min-w-0">
+                <p class="text-sm font-semibold text-soil">
+                    {% if category == 'success' %}Success{% elif category == 'error' %}Attention{% elif category ==
+                    'info' %}Update{% else %}Notice{% endif %}
+                </p>
+                <p class="mt-1 text-sm text-ink/70">{{ message }}</p>
+            </div>
+            <button type="button" class="flash-close" data-dismiss-flash aria-label="Dismiss">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
+
+    <main class="{% if is_admin_command %}min-h-screen{% else %}mx-auto min-h-[calc(100vh-10rem)] max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8{% endif %}">
+        {% block content %}{% endblock %}
+    </main>
+
+    {% if not is_admin_command %}
+    <footer class="border-t border-soil/10 bg-white/60">
+        <div
+            class="mx-auto grid max-w-7xl gap-6 px-4 py-8 text-sm text-ink/70 sm:px-6 lg:grid-cols-[1.6fr_1fr_1fr] lg:px-8">
+            <div class="space-y-3">
+                <p class="font-display text-2xl font-bold text-soil">Smart Farmer</p>
+                <p class="max-w-xl">A modern agricultural marketplace built to help farmers sell with trust, speed, and
+                    direct market visibility.</p>
+            </div>
+            <div>
+                <p class="footer-label">Product</p>
+                <div class="footer-links">
+                    <a href="{{ url_for('marketplace') if session.get('user_id') else url_for('login') }}">Marketplace</a>
+                    <a href="{{ url_for('farmer_dashboard') if session.get('role') == 'farmer' else url_for('register') }}">Farmer
+                        Tools</a>
+                </div>
+            </div>
+            <div>
+                <p class="footer-label">Access</p>
+                <div class="footer-links">
+                    <a href="{{ url_for('login') }}">Customer Login</a>
+                    <a href="{{ url_for('admin_login') }}">Admin Access</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    {% endif %}
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>

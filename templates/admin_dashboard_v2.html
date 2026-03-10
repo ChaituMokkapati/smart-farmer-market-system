@@ -1,0 +1,709 @@
+
+{% extends "base.html" %}
+
+{% block extra_head %}
+<script src="{{ url_for('static', filename='vendor/chartjs/chart.umd.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="admin-shell min-h-screen lg:grid lg:grid-cols-[18rem_minmax(0,1fr)]">
+    <div id="admin-sidebar-backdrop" class="fixed inset-0 z-40 hidden bg-ink/45 backdrop-blur-sm lg:hidden"></div>
+
+    <aside id="admin-sidebar"
+        class="fixed inset-y-0 left-0 z-50 flex w-[18rem] max-w-[86vw] -translate-x-full flex-col border-r border-white/10 bg-[linear-gradient(180deg,rgba(18,36,29,0.98),rgba(23,49,38,0.96))] p-4 text-white shadow-[0_24px_90px_rgba(7,18,12,0.35)] transition-transform duration-300 lg:sticky lg:top-0 lg:h-screen lg:translate-x-0">
+        <div class="admin-sidebar-head flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div
+                    class="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-gradient-to-br from-[#7bc07d] via-leaf to-[#4d86a4] text-white shadow-[0_12px_30px_rgba(38,88,59,0.35)]">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div class="admin-brand-copy">
+                    <p class="font-display text-[1.55rem] font-bold leading-none text-white">Smart Farmer</p>
+                    <p class="mt-1 text-[0.68rem] font-extrabold uppercase tracking-[0.28em] text-white/60">Admin control</p>
+                </div>
+            </div>
+            <button id="admin-sidebar-close" type="button"
+                class="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/8 text-white/72 transition hover:bg-white/12 hover:text-white lg:hidden">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <button id="admin-sidebar-collapse" type="button" aria-label="Collapse sidebar" title="Collapse sidebar"
+            class="admin-sidebar-edge-toggle hidden lg:inline-flex">
+            <i id="admin-sidebar-collapse-icon" class="fa-solid fa-angle-left"></i>
+        </button>
+
+        <div class="admin-sidebar-scroll mt-6 flex flex-1 flex-col gap-4 overflow-y-auto pr-1">
+            <nav class="admin-sidebar-nav space-y-2 text-sm font-bold">
+                <a href="#overview" class="admin-nav-link" title="Overview" aria-label="Overview">
+                    <span class="admin-nav-icon"><i class="fa-solid fa-chart-line"></i></span>
+                    <span class="admin-nav-text">Overview</span>
+                </a>
+                <a href="#farmers" class="admin-nav-link" title="Farmers" aria-label="Farmers">
+                    <span class="admin-nav-icon"><i class="fa-solid fa-user-group"></i></span>
+                    <span class="admin-nav-text">Farmers</span>
+                </a>
+                <a href="#inventory" class="admin-nav-link" title="Inventory" aria-label="Inventory">
+                    <span class="admin-nav-icon"><i class="fa-solid fa-seedling"></i></span>
+                    <span class="admin-nav-text">Inventory</span>
+                </a>
+                <a href="#orders" class="admin-nav-link" title="Orders" aria-label="Orders">
+                    <span class="admin-nav-icon"><i class="fa-solid fa-cart-flatbed"></i></span>
+                    <span class="admin-nav-text">Orders</span>
+                </a>
+                <a href="#directory" class="admin-nav-link" title="Directory" aria-label="Directory">
+                    <span class="admin-nav-icon"><i class="fa-solid fa-address-book"></i></span>
+                    <span class="admin-nav-text">Directory</span>
+                </a>
+                <a href="#reports" class="admin-nav-link" title="Reports" aria-label="Reports">
+                    <span class="admin-nav-icon"><i class="fa-solid fa-file-lines"></i></span>
+                    <span class="admin-nav-text">Reports</span>
+                </a>
+            </nav>
+
+            <div class="admin-sidebar-meta mt-auto rounded-[1.15rem] border border-white/10 bg-white/6 p-3.5">
+                <p class="text-[0.65rem] font-extrabold uppercase tracking-[0.18em] text-white/48">Session identity</p>
+                <p class="mt-2 text-sm font-bold text-white">ROOT_ADMIN</p>
+                <p class="mt-1 text-xs leading-5 text-white/62">OTP verified admin session with full marketplace access.</p>
+            </div>
+
+            <a href="{{ url_for('logout') }}" title="Logout" aria-label="Logout"
+                class="admin-sidebar-logout btn-danger-app w-full justify-center !rounded-[0.95rem] !bg-[rgba(209,85,77,0.1)] !text-[#ffb0a8] !border-[rgba(255,176,168,0.15)]">
+                <i class="fa-solid fa-power-off"></i>
+                <span class="admin-nav-text">Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <div class="min-w-0">
+        <header class="sticky top-0 z-30 border-b border-soil/10 bg-[rgba(247,249,244,0.84)] px-4 py-3 backdrop-blur-xl sm:px-6 lg:px-8">
+            <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+                <div class="flex items-start gap-3">
+                    <button id="admin-sidebar-toggle" type="button"
+                        class="inline-flex h-10 w-10 items-center justify-center rounded-[0.95rem] border border-soil/10 bg-white text-soil shadow-sm transition hover:border-leaf/30 hover:text-leaf lg:hidden">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <div>
+                        <p class="text-[0.68rem] font-extrabold uppercase tracking-[0.28em] text-[#4d86a4]">Agri command room</p>
+                        <h1 class="mt-1 font-display text-[1.7rem] font-bold leading-tight text-soil sm:text-[2rem]">Marketplace operations</h1>
+                        <p class="mt-1.5 max-w-3xl text-sm leading-6 text-ink/62">A tighter control surface for marketplace health, verification, logistics, and paid order movement.</p>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap xl:justify-end">
+                    <div class="admin-chip">
+                        <span class="admin-chip-dot bg-success"></span>
+                        {{ total_orders }} order records in scope
+                    </div>
+                    <div class="admin-chip">
+                        <span class="admin-chip-dot bg-[#4d86a4]"></span>
+                        {{ users|selectattr('role', 'equalto', 'farmer')|rejectattr('is_verified')|list|length }} farmer reviews pending
+                    </div>
+                    <a href="#reports" class="btn-primary-app justify-center whitespace-nowrap">
+                        <i class="fa-solid fa-file-export"></i>
+                        Review reports
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <div class="space-y-6 px-4 py-5 sm:px-6 lg:px-8 lg:py-6">
+            <section id="overview" class="reveal space-y-5">
+                <div class="admin-hero">
+                    <div>
+                        <span class="section-kicker !bg-white/10 !text-[#9ecbe5]">
+                            <i class="fa-solid fa-wave-square"></i>
+                            Live overview
+                        </span>
+                        <h2 class="mt-3 max-w-3xl font-display text-[2.4rem] font-bold leading-tight text-white sm:text-[2.75rem]">Control the marketplace without losing operational context.</h2>
+                        <p class="admin-hero-summary mt-3 max-w-2xl text-sm leading-6">Key numbers, paid revenue, and chart signals stay visible in the first scan instead of hiding below an oversized hero.</p>
+                    </div>
+
+                    <div class="grid gap-3 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
+                        <div class="admin-hero-stat">
+                            <p class="admin-hero-label">Paid revenue</p>
+                            <p class="admin-hero-value">&#8377;{{ "%.0f"|format(total_revenue) }}</p>
+                            <p class="admin-hero-note">Orders marked Paid</p>
+                        </div>
+                        <div class="admin-hero-stat">
+                            <p class="admin-hero-label">Verified growers</p>
+                            <p class="admin-hero-value">{{ users|selectattr('role', 'equalto', 'farmer')|selectattr('is_verified')|list|length }}</p>
+                            <p class="admin-hero-note">Farmers cleared for trust badges</p>
+                        </div>
+                        <div class="admin-hero-stat">
+                            <p class="admin-hero-label">Catalog depth</p>
+                            <p class="admin-hero-value">{{ total_crops }}</p>
+                            <p class="admin-hero-note">Active crop listings</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid gap-4 md:grid-cols-2 2xl:grid-cols-4">
+                    <div class="admin-metric-card">
+                        <div class="admin-metric-icon bg-[rgba(63,125,72,0.12)] text-leaf">
+                            <i class="fa-solid fa-user-group"></i>
+                        </div>
+                        <div>
+                            <p class="metric-label">Registered farmers</p>
+                            <p class="metric-value">{{ total_farmers }}</p>
+                        </div>
+                    </div>
+                    <div class="admin-metric-card">
+                        <div class="admin-metric-icon bg-[rgba(77,134,164,0.12)] text-[#4d86a4]">
+                            <i class="fa-solid fa-seedling"></i>
+                        </div>
+                        <div>
+                            <p class="metric-label">Live products</p>
+                            <p class="metric-value">{{ total_crops }}</p>
+                        </div>
+                    </div>
+                    <div class="admin-metric-card">
+                        <div class="admin-metric-icon bg-[rgba(215,164,74,0.14)] text-grain">
+                            <i class="fa-solid fa-cart-flatbed"></i>
+                        </div>
+                        <div>
+                            <p class="metric-label">Orders tracked</p>
+                            <p class="metric-value">{{ total_orders }}</p>
+                        </div>
+                    </div>
+                    <div class="admin-metric-card">
+                        <div class="admin-metric-icon bg-[rgba(209,85,77,0.12)] text-danger">
+                            <i class="fa-solid fa-clock-rotate-left"></i>
+                        </div>
+                        <div>
+                            <p class="metric-label">Pending verification</p>
+                            <p class="metric-value">{{ users|selectattr('role', 'equalto', 'farmer')|rejectattr('is_verified')|list|length }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid gap-6 xl:grid-cols-2">
+                    <div class="surface-card admin-chart-card p-4 sm:p-5">
+                        <div class="flex flex-wrap items-start justify-between gap-4">
+                            <div>
+                                <p class="text-[0.68rem] font-extrabold uppercase tracking-[0.24em] text-[#4d86a4]">Revenue trend</p>
+                                <h3 class="mt-2 text-xl font-bold text-soil">Paid order movement</h3>
+                            </div>
+                            <span class="badge-app badge-success">Last 7 records</span>
+                        </div>
+                        <p class="mt-2 text-sm leading-6 text-ink/62">Recent paid values plotted by recorded order date.</p>
+                        <div class="mt-5 h-72">
+                            <canvas id="revenueChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="surface-card admin-chart-card p-4 sm:p-5">
+                        <div class="flex flex-wrap items-start justify-between gap-4">
+                            <div>
+                                <p class="text-[0.68rem] font-extrabold uppercase tracking-[0.24em] text-[#4d86a4]">Category mix</p>
+                                <h3 class="mt-2 text-xl font-bold text-soil">Inventory composition</h3>
+                            </div>
+                            <span class="badge-app badge-info">Catalog split</span>
+                        </div>
+                        <p class="mt-2 text-sm leading-6 text-ink/62">Distribution of crop listings across the marketplace catalog.</p>
+                        <div class="mt-5 h-72">
+                            <canvas id="categoryChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="farmers" class="reveal">
+                <div class="surface-card p-5 sm:p-6">
+                    <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+                        <div>
+                            <span class="section-kicker">
+                                <i class="fa-solid fa-user-group"></i>
+                                Farmers
+                            </span>
+                            <h2 class="mt-3 font-display text-[1.85rem] font-bold leading-tight text-soil">Verification registry</h2>
+                            <p class="mt-2 text-sm leading-6 text-ink/62">Review farmer identity, territory, and verification status from one operational table.</p>
+                        </div>
+                        <div class="admin-inline-stat">
+                            <span class="admin-inline-stat-label">Pending approvals</span>
+                            <span class="admin-inline-stat-value">{{ users|selectattr('role', 'equalto', 'farmer')|rejectattr('is_verified')|list|length }}</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 surface-table">
+                        <table class="table-shell">
+                            <thead>
+                                <tr>
+                                    <th>Farmer</th>
+                                    <th>Region</th>
+                                    <th>Email</th>
+                                    <th>Verification</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in users if user.role == 'farmer' %}
+                                <tr>
+                                    <td data-label="Farmer">
+                                        <div class="font-bold text-soil">{{ user.full_name }}</div>
+                                        <div class="mt-1 text-sm text-ink/55">@{{ user.username }}</div>
+                                    </td>
+                                    <td data-label="Region">
+                                        {% if user.city or user.state %}
+                                        {{ user.city }}{% if user.city and user.state %}, {% endif %}{{ user.state }}
+                                        {% else %}
+                                        <span class="text-sm text-ink/48">Location not set</span>
+                                        {% endif %}
+                                    </td>
+                                    <td data-label="Email">{{ user.email }}</td>
+                                    <td data-label="Verification">
+                                        <span class="badge-app {% if user.is_verified %}badge-success{% else %}badge-warning{% endif %}">
+                                            {% if user.is_verified %}Verified{% else %}Pending{% endif %}
+                                        </span>
+                                    </td>
+                                    <td data-label="Actions">
+                                        <div class="admin-table-actions">
+                                            <a href="{{ url_for('toggle_verification', user_id=user.id) }}"
+                                                class="{% if user.is_verified %}btn-outline-app{% else %}btn-primary-app{% endif %} admin-action-btn">
+                                                <i class="fa-solid fa-shield"></i>
+                                                {% if user.is_verified %}Revoke{% else %}Allow{% endif %}
+                                            </a>
+                                            <a href="{{ url_for('delete_user', id=user.id) }}" class="btn-danger-app admin-action-btn"
+                                                onclick="return confirm('Remove this farmer account?')">
+                                                <i class="fa-solid fa-user-slash"></i>
+                                                Delete
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="5">
+                                        <div class="empty-state my-4">
+                                            <h3 class="font-display text-[2rem] font-bold text-soil">No farmer records yet</h3>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="inventory" class="reveal">
+                <div class="surface-card p-5 sm:p-6">
+                    <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+                        <div>
+                            <span class="section-kicker">
+                                <i class="fa-solid fa-seedling"></i>
+                                Inventory
+                            </span>
+                            <h2 class="mt-3 font-display text-[1.85rem] font-bold leading-tight text-soil">Marketplace inventory</h2>
+                            <p class="mt-2 text-sm leading-6 text-ink/62">Scan live crop stock, price bands, and category spread without switching views.</p>
+                        </div>
+                        <div class="admin-inline-stat">
+                            <span class="admin-inline-stat-label">Catalog size</span>
+                            <span class="admin-inline-stat-value">{{ total_crops }}</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 surface-table">
+                        <table class="table-shell">
+                            <thead>
+                                <tr>
+                                    <th>Crop</th>
+                                    <th>Farmer</th>
+                                    <th>Stock</th>
+                                    <th>Price</th>
+                                    <th>Category</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for crop in crops %}
+                                <tr>
+                                    <td data-label="Crop">
+                                        <div class="font-bold text-soil">{{ crop.name }}</div>
+                                        <div class="mt-1 text-sm text-ink/55">ID #CRP-{{ crop.id }}</div>
+                                    </td>
+                                    <td data-label="Farmer">{{ crop.farmer_name }}</td>
+                                    <td data-label="Stock">{{ crop.quantity }} kg</td>
+                                    <td data-label="Price" class="font-bold text-soil">&#8377;{{ crop.price }}</td>
+                                    <td data-label="Category">
+                                        <span class="badge-app badge-neutral">{{ crop.category or 'General' }}</span>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="5">
+                                        <div class="empty-state my-4">
+                                            <h3 class="font-display text-[2rem] font-bold text-soil">No inventory data available</h3>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="orders" class="reveal">
+                <div class="surface-card p-5 sm:p-6">
+                    <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+                        <div>
+                            <span class="section-kicker">
+                                <i class="fa-solid fa-cart-flatbed"></i>
+                                Orders
+                            </span>
+                            <h2 class="mt-3 font-display text-[1.85rem] font-bold leading-tight text-soil">Order stream management</h2>
+                            <p class="mt-2 text-sm leading-6 text-ink/62">Update lifecycle status directly inside the stream without losing customer and crop context.</p>
+                        </div>
+                        <div class="admin-inline-stat">
+                            <span class="admin-inline-stat-label">Tracked orders</span>
+                            <span class="admin-inline-stat-value">{{ total_orders }}</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 surface-table">
+                        <table class="table-shell">
+                            <thead>
+                                <tr>
+                                    <th>Order</th>
+                                    <th>Customer</th>
+                                    <th>Crop</th>
+                                    <th>Value</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in orders %}
+                                <tr>
+                                    <td data-label="Order">
+                                        <div class="font-bold text-soil">#ORD-{{ order.id }}</div>
+                                    </td>
+                                    <td data-label="Customer">{{ order.customer_name }}</td>
+                                    <td data-label="Crop">{{ order.crop_name }}</td>
+                                    <td data-label="Value" class="font-bold text-soil">&#8377;{{ order.total_price }}</td>
+                                    <td data-label="Status">
+                                        <form action="{{ url_for('admin_update_order', id=order.id) }}" method="POST" class="flex flex-col gap-2 sm:flex-row">
+                                            <select name="status" class="select-shell status-select">
+                                                <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>Pending</option>
+                                                <option value="Paid" {% if order.status == 'Paid' %}selected{% endif %}>Paid</option>
+                                                <option value="Shipped" {% if order.status == 'Shipped' %}selected{% endif %}>Shipped</option>
+                                                <option value="Delivered" {% if order.status == 'Delivered' %}selected{% endif %}>Delivered</option>
+                                                <option value="Cancelled" {% if order.status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                                                <option value="Completed" {% if order.status == 'Completed' %}selected{% endif %}>Completed</option>
+                                            </select>
+                                            <button type="submit" class="btn-primary-app justify-center px-4 py-3 text-sm">
+                                                Update
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="5">
+                                        <div class="empty-state my-4">
+                                            <h3 class="font-display text-[2rem] font-bold text-soil">No orders yet</h3>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="directory" class="reveal">
+                <div class="surface-card p-5 sm:p-6">
+                    <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+                        <div>
+                            <span class="section-kicker">
+                                <i class="fa-solid fa-address-book"></i>
+                                Directory
+                            </span>
+                            <h2 class="mt-3 font-display text-[1.85rem] font-bold leading-tight text-soil">User directory</h2>
+                            <p class="mt-2 text-sm leading-6 text-ink/62">Administrative directory for role visibility, email identity, and account control.</p>
+                        </div>
+                        <div class="admin-inline-stat">
+                            <span class="admin-inline-stat-label">User accounts</span>
+                            <span class="admin-inline-stat-value">{{ users|length }}</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 surface-table">
+                        <table class="table-shell">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Role</th>
+                                    <th>Email</th>
+                                    <th>Status</th>
+                                    <th>Access</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in users %}
+                                <tr>
+                                    <td data-label="Name">
+                                        <div class="font-bold text-soil">{{ user.full_name }}</div>
+                                        <div class="mt-1 text-sm text-ink/55">@{{ user.username }}</div>
+                                    </td>
+                                    <td data-label="Role">
+                                        <span class="badge-app {% if user.role == 'admin' %}badge-info{% elif user.role == 'farmer' %}badge-success{% else %}badge-neutral{% endif %}">
+                                            {{ user.role }}
+                                        </span>
+                                    </td>
+                                    <td data-label="Email">{{ user.email }}</td>
+                                    <td data-label="Status">
+                                        {% if user.role == 'farmer' %}
+                                        <span class="badge-app {% if user.is_verified %}badge-success{% else %}badge-warning{% endif %}">
+                                            {% if user.is_verified %}Verified{% else %}Pending{% endif %}
+                                        </span>
+                                        {% else %}
+                                        <span class="badge-app badge-neutral">Standard</span>
+                                        {% endif %}
+                                    </td>
+                                    <td data-label="Access">
+                                        {% if user.role == 'farmer' %}
+                                        <a href="{{ url_for('toggle_verification', user_id=user.id) }}"
+                                            class="{% if user.is_verified %}btn-outline-app{% else %}btn-primary-app{% endif %} admin-action-btn">
+                                            <i class="fa-solid {% if user.is_verified %}fa-user-slash{% else %}fa-user-check{% endif %}"></i>
+                                            {% if user.is_verified %}Revoke{% else %}Allow{% endif %}
+                                        </a>
+                                        {% elif user.role != 'admin' %}
+                                        <a href="{{ url_for('delete_user', id=user.id) }}" class="btn-danger-app admin-action-btn"
+                                            onclick="return confirm('Remove this user account?')">
+                                            <i class="fa-solid fa-trash"></i>
+                                            Delete
+                                        </a>
+                                        {% else %}
+                                        <span class="text-sm font-bold text-ink/45">Protected</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="reports" class="reveal">
+                <div class="grid gap-6 xl:grid-cols-[1.3fr_0.9fr]">
+                    <div class="surface-card p-5 sm:p-6">
+                        <span class="section-kicker">
+                            <i class="fa-solid fa-file-lines"></i>
+                            Reports
+                        </span>
+                        <h2 class="mt-3 font-display text-[1.85rem] font-bold leading-tight text-soil">Operational notes</h2>
+                        <p class="mt-3 max-w-2xl text-sm leading-7 text-ink/68">Keep these control-room rules visible when moderating payments, verification, and transaction health.</p>
+                        <div class="mt-6 grid gap-4">
+                            <div class="admin-note-card">
+                                <div class="admin-note-icon text-leaf"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+                                <div>
+                                    <p class="font-bold text-soil">Revenue source</p>
+                                    <p class="mt-1 text-sm leading-6 text-ink/62">Paid revenue is summarized only from orders marked <span class="font-bold text-soil">Paid</span>.</p>
+                                </div>
+                            </div>
+                            <div class="admin-note-card">
+                                <div class="admin-note-icon text-[#4d86a4]"><i class="fa-solid fa-user-check"></i></div>
+                                <div>
+                                    <p class="font-bold text-soil">Verification control</p>
+                                    <p class="mt-1 text-sm leading-6 text-ink/62">Farmer verification toggles remain available in the registry without changing backend behavior.</p>
+                                </div>
+                            </div>
+                            <div class="admin-note-card">
+                                <div class="admin-note-icon text-grain"><i class="fa-solid fa-route"></i></div>
+                                <div>
+                                    <p class="font-bold text-soil">Order editing</p>
+                                    <p class="mt-1 text-sm leading-6 text-ink/62">Order status controls stay connected to the existing admin update route and submit directly from the table.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="surface-card p-5 sm:p-6">
+                        <span class="section-kicker">
+                            <i class="fa-solid fa-satellite-dish"></i>
+                            Status
+                        </span>
+                        <h2 class="mt-3 font-display text-[1.85rem] font-bold leading-tight text-soil">Control room pulse</h2>
+                        <div class="mt-6 space-y-4">
+                            <div class="admin-status-card">
+                                <p class="admin-status-label">Paid revenue</p>
+                                <p class="admin-status-value">&#8377;{{ "%.0f"|format(total_revenue) }}</p>
+                            </div>
+                            <div class="admin-status-card">
+                                <p class="admin-status-label">Pending verification</p>
+                                <p class="admin-status-value">{{ users|selectattr('role', 'equalto', 'farmer')|rejectattr('is_verified')|list|length }}</p>
+                            </div>
+                            <div class="admin-status-card">
+                                <p class="admin-status-label">Marketplace catalog</p>
+                                <p class="admin-status-value">{{ total_crops }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const revenueLabels = {{ revenue_trend|map(attribute=0)|list|reverse|list|tojson }};
+    const revenueData = {{ revenue_trend|map(attribute=1)|list|reverse|list|tojson }};
+    const categoryLabels = {{ category_counts|map(attribute=0)|list|tojson }};
+    const categoryData = {{ category_counts|map(attribute=1)|list|tojson }};
+
+    const revenueChart = document.getElementById('revenueChart');
+    const categoryChart = document.getElementById('categoryChart');
+
+    if (revenueChart) {
+        new Chart(revenueChart, {
+            type: 'line',
+            data: {
+                labels: revenueLabels,
+                datasets: [{
+                    label: 'Revenue',
+                    data: revenueData,
+                    borderColor: '#4d86a4',
+                    backgroundColor: 'rgba(77, 134, 164, 0.12)',
+                    borderWidth: 3,
+                    pointRadius: 3,
+                    pointHoverRadius: 4,
+                    fill: true,
+                    tension: 0.35
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#173126',
+                        titleColor: '#f8fbf6',
+                        bodyColor: '#d9e8d5',
+                        displayColors: false
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: 'rgba(16, 33, 22, 0.58)' }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(31, 58, 45, 0.08)' },
+                        ticks: { color: 'rgba(16, 33, 22, 0.58)' }
+                    }
+                }
+            }
+        });
+    }
+
+    if (categoryChart) {
+        new Chart(categoryChart, {
+            type: 'doughnut',
+            data: {
+                labels: categoryLabels,
+                datasets: [{
+                    data: categoryData,
+                    backgroundColor: ['#1f3a2d', '#3f7d48', '#4d86a4', '#d7a44a', '#8a5c3d', '#9dc08b'],
+                    borderColor: '#f7f6f1',
+                    borderWidth: 4,
+                    hoverOffset: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '62%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            boxWidth: 12,
+                            usePointStyle: true,
+                            padding: 18,
+                            color: 'rgba(16, 33, 22, 0.68)'
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: '#173126',
+                        titleColor: '#f8fbf6',
+                        bodyColor: '#d9e8d5'
+                    }
+                }
+            }
+        });
+    }
+
+    const toggleButton = document.getElementById('admin-sidebar-toggle');
+    const collapseButton = document.getElementById('admin-sidebar-collapse');
+    const collapseButtonIcon = document.getElementById('admin-sidebar-collapse-icon');
+    const closeButton = document.getElementById('admin-sidebar-close');
+    const sidebar = document.getElementById('admin-sidebar');
+    const adminShell = document.querySelector('.admin-shell');
+    const backdrop = document.getElementById('admin-sidebar-backdrop');
+    const navLinks = sidebar ? sidebar.querySelectorAll('a[href^="#"]') : [];
+    const desktopBreakpoint = 1024;
+
+    const setCollapsedState = (collapsed) => {
+        if (!adminShell) return;
+        adminShell.classList.toggle('is-collapsed', collapsed);
+        if (collapseButtonIcon) {
+            collapseButtonIcon.classList.toggle('fa-angle-right', collapsed);
+            collapseButtonIcon.classList.toggle('fa-angle-left', !collapsed);
+        }
+        if (collapseButton) {
+            const label = collapsed ? 'Expand sidebar' : 'Collapse sidebar';
+            collapseButton.setAttribute('aria-label', label);
+            collapseButton.setAttribute('title', label);
+        }
+        localStorage.setItem('adminSidebarCollapsed', collapsed ? 'true' : 'false');
+    };
+
+    const openSidebar = () => {
+        if (!sidebar || window.innerWidth >= desktopBreakpoint) return;
+        sidebar.classList.remove('-translate-x-full');
+        backdrop?.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+    };
+
+    const closeSidebar = () => {
+        if (!sidebar || window.innerWidth >= desktopBreakpoint) return;
+        sidebar.classList.add('-translate-x-full');
+        backdrop?.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+    };
+
+    if (window.innerWidth >= desktopBreakpoint) {
+        setCollapsedState(localStorage.getItem('adminSidebarCollapsed') === 'true');
+    }
+
+    toggleButton?.addEventListener('click', openSidebar);
+    collapseButton?.addEventListener('click', () => {
+        if (window.innerWidth < desktopBreakpoint) return;
+        setCollapsedState(!adminShell?.classList.contains('is-collapsed'));
+    });
+    closeButton?.addEventListener('click', closeSidebar);
+    backdrop?.addEventListener('click', closeSidebar);
+    navLinks.forEach((link) => link.addEventListener('click', closeSidebar));
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') closeSidebar();
+    });
+
+    window.addEventListener('resize', () => {
+        if (window.innerWidth >= desktopBreakpoint) {
+            backdrop?.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+            setCollapsedState(localStorage.getItem('adminSidebarCollapsed') === 'true');
+        } else if (sidebar?.classList.contains('-translate-x-full')) {
+            backdrop?.classList.add('hidden');
+            adminShell?.classList.remove('is-collapsed');
+        }
+    });
+</script>
+{% endblock %}

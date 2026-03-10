@@ -1,0 +1,373 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="surface-panel reveal rounded-[1.8rem] px-5 py-6 sm:px-7 sm:py-8">
+    <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+            <span class="section-kicker">
+                <i class="fa-solid fa-tractor"></i>
+                Farmer workspace
+            </span>
+            <h1 class="mt-4 font-display text-3xl font-bold text-soil sm:text-[2.7rem]">Run your harvest operation</h1>
+            <p class="mt-3 max-w-2xl text-sm leading-6 text-ink/70">Manage fresh listings, watch incoming orders,
+                and keep your storefront updated with a single operational dashboard.</p>
+        </div>
+        <div>
+            {% if is_verified %}
+            <span class="badge-app badge-success">
+                <i class="fa-solid fa-badge-check"></i>
+                Verified partner
+            </span>
+            {% else %}
+            <span class="badge-app badge-warning">
+                <i class="fa-regular fa-clock"></i>
+                Verification pending
+            </span>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+        <div class="metric-card">
+            <p class="metric-label">Active listings</p>
+            <p class="metric-value">{{ crops|length }}</p>
+        </div>
+        <div class="metric-card">
+            <p class="metric-label">Open orders</p>
+            <p class="metric-value">{{ orders|length }}</p>
+        </div>
+        <div class="metric-card">
+            <p class="metric-label">Inventory</p>
+            <p class="metric-value">{{ crops|sum(attribute='quantity') if crops else 0 }}</p>
+            <p class="mt-2 text-sm text-ink/62">kg listed across all crops</p>
+        </div>
+        <div class="metric-card">
+            <p class="metric-label">Order value</p>
+            <p class="metric-value">&#8377;{{ "%.0f"|format(orders|sum(attribute='total_price')) if orders else 0 }}</p>
+            <p class="mt-2 text-sm text-ink/62">Gross order amount in pipeline</p>
+        </div>
+    </div>
+</section>
+
+<section class="mt-8 grid gap-8 xl:grid-cols-[0.95fr_1.05fr]">
+    <div class="reveal">
+        <div class="surface-card p-5 sm:p-6">
+            <span class="section-kicker">
+                <i class="fa-solid fa-plus"></i>
+                New listing
+            </span>
+            <h2 class="mt-3 font-display text-[1.9rem] font-bold text-soil">List fresh harvest</h2>
+            <p class="mt-2 text-sm leading-6 text-ink/68">Publish crop details, stock, location, and proof to improve
+                buyer confidence.</p>
+
+            <form action="{{ url_for('add_crop') }}" method="POST" enctype="multipart/form-data" class="mt-6 space-y-4">
+                <div>
+                    <label class="field-label" for="name">Product name</label>
+                    <input id="name" class="input-shell" type="text" name="name" placeholder="Sona Masuri Rice" required>
+                </div>
+
+                <div class="grid gap-4 sm:grid-cols-2">
+                    <div>
+                        <label class="field-label" for="category_select">Category</label>
+                        <select id="category_select" class="select-shell" name="category" required>
+                            <option value="Vegetables">Vegetables</option>
+                            <option value="Fruits">Fruits</option>
+                            <option value="Grains">Grains</option>
+                            <option value="Rice Varieties">Rice Varieties</option>
+                            <option value="Pulses">Pulses</option>
+                            <option value="Spices">Spices</option>
+                            <option value="Dairy Products">Dairy Products</option>
+                            <option value="Milk">Milk</option>
+                            <option value="Eggs">Eggs</option>
+                            <option value="Meat">Meat</option>
+                            <option value="Honey">Honey</option>
+                            <option value="Organic Products">Organic Products</option>
+                            <option value="Farming Products">Farming Products</option>
+                            <option value="Others">Others</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="field-label" for="quality">Quality grade</label>
+                        <select id="quality" class="select-shell" name="quality" required>
+                            <option value="A-Grade (Export)">A-Grade (Export Quality)</option>
+                            <option value="B-Grade (Premium)">B-Grade (Premium)</option>
+                            <option value="Organic Certified">Organic Certified</option>
+                            <option value="Standard">Standard</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid gap-4 sm:grid-cols-2">
+                    <div>
+                        <label class="field-label" for="state">State</label>
+                        <select id="state" class="select-shell" name="state" required>
+                            <option value="Telangana">Telangana</option>
+                            <option value="Andhra Pradesh">Andhra Pradesh</option>
+                            <option value="Karnataka">Karnataka</option>
+                            <option value="Tamil Nadu">Tamil Nadu</option>
+                            <option value="Maharashtra">Maharashtra</option>
+                            <option value="Kerala">Kerala</option>
+                            <option value="Odisha">Odisha</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="field-label" for="district">District</label>
+                        <input id="district" class="input-shell" type="text" name="district" placeholder="Guntur" required>
+                    </div>
+                </div>
+
+                <div class="grid gap-4 sm:grid-cols-2">
+                    <div>
+                        <label class="field-label" for="village">Village</label>
+                        <input id="village" class="input-shell" type="text" name="village" placeholder="Amaravati" required>
+                    </div>
+                    <div>
+                        <label class="field-label" for="pincode">Pincode</label>
+                        <input id="pincode" class="input-shell" type="text" name="pincode" placeholder="522001" required>
+                    </div>
+                </div>
+
+                <div class="grid gap-4 sm:grid-cols-2">
+                    <div>
+                        <label class="field-label" for="quantity">Quantity</label>
+                        <input id="quantity" class="input-shell" type="number" step="0.1" name="quantity"
+                            placeholder="100" required>
+                    </div>
+                    <div>
+                        <label class="field-label" for="harvest_date">Harvest date</label>
+                        <input id="harvest_date" class="input-shell" type="date" name="harvest_date" required>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="field-label" for="product_price">Price per unit</label>
+                    <input id="product_price" class="input-shell" type="number" step="0.01" name="price"
+                        placeholder="50.00" required>
+                    <div id="price_suggestion" class="mt-2.5 rounded-[1rem] border border-leaf/10 bg-mist/70 px-4 py-3 text-sm font-semibold text-soil">
+                        Select a category for price advice.
+                    </div>
+                </div>
+
+                <div class="grid gap-4 sm:grid-cols-2">
+                    <div>
+                        <label class="field-label" for="crop_image">Crop image</label>
+                        <input id="crop_image" class="file-input file-shell" type="file" name="image" accept="image/*">
+                    </div>
+                    <div>
+                        <label class="field-label" for="quality_proof">Quality proof</label>
+                        <input id="quality_proof" class="file-input file-shell" type="file" name="quality_proof"
+                            accept="image/*" required>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="field-label" for="description">Description</label>
+                    <textarea id="description" class="textarea-shell" name="description"
+                        placeholder="Describe freshness, harvest notes, storage details, or variety traits."></textarea>
+                </div>
+
+                <button type="submit" class="btn-primary-app w-full">
+                    Publish listing
+                    <i class="fa-solid fa-arrow-up-right-dots"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="reveal space-y-8">
+        <div class="surface-card p-5 sm:p-6">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                    <span class="section-kicker">
+                        <i class="fa-solid fa-boxes-stacked"></i>
+                        Inventory
+                    </span>
+                    <h2 class="mt-3 font-display text-[1.9rem] font-bold text-soil">Active listings</h2>
+                </div>
+            </div>
+
+            {% if crops %}
+            <div class="mt-6 surface-table">
+                <table class="table-shell">
+                    <thead>
+                        <tr>
+                            <th>Crop</th>
+                            <th>Stock</th>
+                            <th>Price</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for crop in crops %}
+                        <tr>
+                            <td data-label="Crop">
+                                <div class="font-bold text-soil">{{ crop.name }}</div>
+                                <div class="mt-1 text-sm text-ink/55">{{ crop.category or 'General' }}</div>
+                            </td>
+                            <td data-label="Stock">
+                                <div class="font-bold text-soil">{{ crop.quantity }} kg</div>
+                            </td>
+                            <td data-label="Price">
+                                <div class="font-bold text-soil">&#8377;{{ crop.price }}</div>
+                            </td>
+                            <td data-label="Actions">
+                                <div class="flex flex-wrap gap-2">
+                                    <a href="{{ url_for('edit_crop', id=crop.id) }}" class="btn-outline-app px-4 py-3 text-sm">
+                                        <i class="fa-solid fa-pen"></i>
+                                        Edit
+                                    </a>
+                                    <a href="{{ url_for('delete_crop', id=crop.id) }}" class="btn-danger-app px-4 py-3 text-sm"
+                                        onclick="return confirm('Archive this listing?')">
+                                        <i class="fa-solid fa-trash"></i>
+                                        Delete
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state mt-6">
+                <h3 class="font-display text-[2rem] font-bold text-soil">No active listings yet</h3>
+                <p class="mx-auto mt-3 max-w-xl text-sm leading-6 text-ink/65 sm:text-base">Publish your first crop to
+                    start appearing in the customer marketplace.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="surface-card p-5 sm:p-6">
+            <div>
+                <span class="section-kicker">
+                    <i class="fa-solid fa-cart-flatbed"></i>
+                    Orders
+                </span>
+                <h2 class="mt-3 font-display text-[1.9rem] font-bold text-soil">Incoming orders</h2>
+            </div>
+
+            {% if orders %}
+            <div class="mt-6 space-y-4">
+                {% for order in orders %}
+                <article class="rounded-[1.2rem] border border-soil/10 bg-mist/55 p-4">
+                    <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                        <div>
+                            <div class="flex flex-wrap items-center gap-3">
+                                <h3 class="font-display text-[1.5rem] font-bold text-soil">{{ order.crop_name }}</h3>
+                                <span class="badge-app {% if order.status in ['Delivered'] %}badge-success{% elif order.status in ['Cancelled'] %}badge-danger{% elif order.status in ['Shipped', 'Out for Delivery'] %}badge-info{% else %}badge-warning{% endif %}">
+                                    {{ order.status }}
+                                </span>
+                            </div>
+                            <p class="mt-2 text-sm font-semibold text-ink/62">
+                                <i class="fa-solid fa-user text-leaf"></i>
+                                {{ order.customer_name }}
+                                {% if order.customer_email %}
+                                <span class="ml-2 text-ink/48">{{ order.customer_email }}</span>
+                                {% endif %}
+                            </p>
+                            <div class="mt-4 grid gap-3 sm:grid-cols-2">
+                                <div class="rounded-[1rem] bg-white/70 p-3.5">
+                                    <p class="metric-label">Volume</p>
+                                    <p class="mt-2 font-display text-[1.45rem] font-bold text-soil">{{ order.quantity }} kg</p>
+                                </div>
+                                <div class="rounded-[1rem] bg-white/70 p-3.5">
+                                    <p class="metric-label">Value</p>
+                                    <p class="mt-2 font-display text-[1.45rem] font-bold text-soil">&#8377;{{ "%.2f"|format(order.total_price) }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="w-full lg:w-[20rem]">
+                            {% if order.status not in ['Delivered', 'Cancelled'] %}
+                            <form action="{{ url_for('farmer_update_order') }}" method="POST" class="space-y-3">
+                                <input type="hidden" name="order_id" value="{{ order.id }}">
+                                <div>
+                                    <label class="field-label" for="status-{{ order.id }}">Update status</label>
+                                    <select id="status-{{ order.id }}" class="select-shell status-select" name="status" required>
+                                        <option value="Order Confirmed">Order Confirmed</option>
+                                        <option value="Packed">Packed</option>
+                                        <option value="Shipped">Shipped</option>
+                                        <option value="Out for Delivery">Out for Delivery</option>
+                                        <option value="Delivered">Delivered</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="field-label" for="location-{{ order.id }}">Current location</label>
+                                    <input id="location-{{ order.id }}" class="input-shell" type="text" name="location"
+                                        placeholder="Sorting hub, city, or delivery point">
+                                </div>
+                                <button type="submit" class="btn-primary-app w-full">
+                                    Update order
+                                    <i class="fa-solid fa-arrow-up"></i>
+                                </button>
+                            </form>
+                            {% else %}
+                            <div class="rounded-[1.2rem] border border-soil/10 bg-white/70 p-4 text-sm text-ink/65">
+                                This order is already finalized and no further status changes are needed.
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state mt-6">
+                <h3 class="font-display text-[2rem] font-bold text-soil">No incoming orders yet</h3>
+                <p class="mx-auto mt-3 max-w-xl text-sm leading-6 text-ink/65 sm:text-base">Customer orders will appear
+                    here as soon as your listings begin converting.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const fileInputs = document.querySelectorAll('.file-input');
+    const categorySelect = document.getElementById('category_select');
+    const suggestionText = document.getElementById('price_suggestion');
+    const maxSize = 2 * 1024 * 1024;
+    const marketPrices = {
+        'Vegetables': { min: 20, max: 60 },
+        'Fruits': { min: 40, max: 200 },
+        'Grains': { min: 30, max: 100 },
+        'Rice Varieties': { min: 50, max: 120 },
+        'Pulses': { min: 90, max: 150 },
+        'Spices': { min: 100, max: 500 },
+        'Dairy Products': { min: 200, max: 600 },
+        'Milk': { min: 60, max: 80 },
+        'Eggs': { min: 5, max: 10 },
+        'Meat': { min: 200, max: 800 },
+        'Honey': { min: 300, max: 600 },
+        'Organic Products': { min: 100, max: 1000 },
+        'Farming Products': { min: 50, max: 5000 },
+        'Others': { min: 1, max: 10000 }
+    };
+
+    function updateSuggestion() {
+        const selected = categorySelect.value;
+        const range = marketPrices[selected];
+        if (!range) {
+            suggestionText.textContent = 'Select a category for price advice.';
+            return;
+        }
+
+        const suggested = Math.floor((range.min + range.max) / 2);
+        suggestionText.innerHTML = `<i class="fa-solid fa-lightbulb mr-2"></i>Market range: &#8377;${range.min} to &#8377;${range.max}. Suggested list price: &#8377;${suggested}.`;
+    }
+
+    fileInputs.forEach((input) => {
+        input.addEventListener('change', function () {
+            if (this.files && this.files[0] && this.files[0].size > maxSize) {
+                alert('File is too large. Maximum allowed size is 2MB.');
+                this.value = '';
+            }
+        });
+    });
+
+    categorySelect.addEventListener('change', updateSuggestion);
+    updateSuggestion();
+</script>
+{% endblock %}

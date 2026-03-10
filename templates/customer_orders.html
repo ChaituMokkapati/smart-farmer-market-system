@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="surface-panel reveal rounded-[1.8rem] px-5 py-6 sm:px-7 sm:py-8">
+    <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+            <span class="section-kicker">
+                <i class="fa-solid fa-truck-fast"></i>
+                Customer dashboard
+            </span>
+            <h1 class="mt-4 font-display text-3xl font-bold text-soil sm:text-[2.7rem]">Track your purchase journey</h1>
+            <p class="mt-3 max-w-2xl text-sm leading-6 text-ink/70">Stay on top of active deliveries, payment
+                progress, and completed orders with one clean timeline-driven workspace.</p>
+        </div>
+        <div class="grid gap-3 sm:grid-cols-2">
+            <div class="metric-card min-w-[10rem]">
+                <p class="metric-label">Active orders</p>
+                <p class="metric-value">{{ active_orders|length }}</p>
+            </div>
+            <div class="metric-card min-w-[10rem]">
+                <p class="metric-label">History</p>
+                <p class="metric-value">{{ order_history|length }}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="mt-8 reveal">
+    <div>
+        <span class="section-kicker">
+            <i class="fa-solid fa-route"></i>
+            Active deliveries
+        </span>
+        <h2 class="mt-3 font-display text-[1.9rem] font-bold text-soil">Orders in progress</h2>
+    </div>
+
+    <div class="mt-6 grid gap-5 xl:grid-cols-2">
+        {% for order in active_orders %}
+        {% set ns = namespace(stage_index=0) %}
+        {% for update in order.tracking %}
+        {% if update.status == 'Order Confirmed' %}{% set ns.stage_index = 1 %}{% endif %}
+        {% if update.status == 'Packed' %}{% set ns.stage_index = 2 %}{% endif %}
+        {% if update.status == 'Shipped' %}{% set ns.stage_index = 3 %}{% endif %}
+        {% if update.status == 'Out for Delivery' %}{% set ns.stage_index = 4 %}{% endif %}
+        {% if update.status == 'Delivered' %}{% set ns.stage_index = 5 %}{% endif %}
+        {% endfor %}
+        <article class="surface-card reveal p-4 sm:p-5">
+            <div class="flex flex-col gap-5 sm:flex-row">
+                <div class="w-full sm:w-40">
+                    {% if order.crop_image %}
+                    <img src="{{ url_for('static', filename=order.crop_image) }}" alt="{{ order.crop_name }}"
+                        class="crop-thumb">
+                    {% else %}
+                    <div
+                        class="flex aspect-[4/3] w-full items-center justify-center rounded-[1.4rem] bg-mist text-4xl text-leaf/45">
+                        <i class="fa-solid fa-seedling"></i>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="min-w-0 flex-1">
+                    <div class="flex flex-wrap items-start justify-between gap-3">
+                        <div>
+                            <h3 class="font-display text-[1.9rem] font-bold text-soil">{{ order.crop_name }}</h3>
+                            <p class="mt-1 text-sm font-semibold text-ink/65">
+                                <i class="fa-solid fa-store text-leaf"></i>
+                                {{ order.farmer_name }}
+                            </p>
+                        </div>
+                        <span class="badge-app {% if order.status in ['pending', 'Paid'] %}badge-warning{% elif order.status in ['Shipped', 'Out for Delivery'] %}badge-info{% else %}badge-success{% endif %}">
+                            {{ order.status }}
+                        </span>
+                    </div>
+
+                    <div class="mt-4 grid gap-3 sm:grid-cols-3">
+                        <div class="rounded-2xl bg-mist/70 p-4">
+                            <p class="metric-label">Amount</p>
+                            <p class="mt-2 font-display text-2xl font-bold text-soil">&#8377;{{ "%.2f"|format(order.total_price) }}</p>
+                        </div>
+                        <div class="rounded-2xl bg-mist/70 p-4">
+                            <p class="metric-label">Volume</p>
+                            <p class="mt-2 font-display text-2xl font-bold text-soil">{{ order.quantity }} kg</p>
+                        </div>
+                        <div class="rounded-2xl bg-mist/70 p-4">
+                            <p class="metric-label">ETA</p>
+                            <p class="mt-2 font-body text-lg font-extrabold text-soil">{{ order.estimated_delivery }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-5 rounded-[1.2rem] border border-soil/10 bg-white/65 p-4">
+                <div class="mb-4 flex items-center justify-between gap-3">
+                    <div>
+                        <p class="text-sm font-bold text-soil">Delivery timeline</p>
+                        <p class="text-sm text-ink/62">Current location: {{ order.current_location or 'Awaiting movement' }}</p>
+                    </div>
+                    <span class="badge-app badge-neutral">Order #{{ order.id }}</span>
+                </div>
+                {% set stages = ['Order Placed', 'Order Confirmed', 'Packed', 'Shipped', 'Out for Delivery', 'Delivered'] %}
+                <div>
+                    {% for stage in stages %}
+                    <div class="timeline-step {% if loop.index0 <= ns.stage_index %}active{% endif %}">
+                        <span class="timeline-dot">
+                            <i class="fa-solid fa-check text-[0.6rem]"></i>
+                        </span>
+                        <div class="min-w-0 flex-1">
+                            <div class="flex flex-wrap items-center justify-between gap-2">
+                                <p class="font-bold {% if loop.index0 <= ns.stage_index %}text-soil{% else %}text-ink/45{% endif %}">
+                                    {{ stage }}
+                                </p>
+                                {% for update in order.tracking %}
+                                {% if update.status == stage %}
+                                <span class="text-xs font-semibold text-ink/45">{{ update.update_date[:16] }}</span>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                            {% for update in order.tracking %}
+                            {% if update.status == stage and update.location %}
+                            <p class="mt-1 text-sm text-ink/62">{{ update.location }}</p>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            {% if order.status in ['pending', 'Paid', 'Confirmed'] %}
+            <div class="mt-5 flex flex-col gap-3 sm:flex-row">
+                {% if order.status == 'pending' %}
+                <a href="{{ url_for('checkout', order_id=order.id) }}" class="btn-primary-app flex-1 justify-center">
+                    Complete payment
+                    <i class="fa-solid fa-credit-card"></i>
+                </a>
+                {% endif %}
+                <form action="{{ url_for('cancel_order', order_id=order.id) }}" method="POST"
+                    onsubmit="return confirm('Cancel this order?');"
+                    class="{% if order.status == 'pending' %}flex-1{% else %}w-full{% endif %}">
+                    <button type="submit" class="btn-danger-app w-full justify-center">
+                        Cancel order
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </form>
+            </div>
+            {% endif %}
+        </article>
+        {% else %}
+        <div class="empty-state xl:col-span-2">
+            <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-mist text-2xl text-leaf/55">
+                <i class="fa-solid fa-basket-shopping"></i>
+            </div>
+            <h3 class="mt-5 font-display text-[2rem] font-bold text-soil">No active orders right now</h3>
+            <p class="mx-auto mt-3 max-w-xl text-sm leading-6 text-ink/65 sm:text-base">Once you place an order, its
+                live progress and fulfillment details will appear here.</p>
+            <a href="{{ url_for('marketplace') }}" class="btn-primary-app mt-6">
+                Browse marketplace
+                <i class="fa-solid fa-arrow-right"></i>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="mt-10 reveal">
+    <div>
+        <span class="section-kicker">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+            Archive
+        </span>
+        <h2 class="mt-3 font-display text-[1.9rem] font-bold text-soil">Completed and cancelled orders</h2>
+    </div>
+
+    <div class="mt-6 grid gap-5 lg:grid-cols-2 xl:grid-cols-3">
+        {% for order in order_history %}
+        <article class="surface-card reveal p-4">
+            <div class="flex items-start justify-between gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-mist text-xl text-leaf/55">
+                        <i class="fa-solid {% if order.status == 'Delivered' %}fa-circle-check{% else %}fa-ban{% endif %}"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-soil">{{ order.crop_name }}</h3>
+                        <p class="text-sm text-ink/55">{{ order.order_date[:10] }}</p>
+                    </div>
+                </div>
+                <span class="badge-app {% if order.status == 'Delivered' %}badge-success{% else %}badge-danger{% endif %}">
+                    {{ order.status }}
+                </span>
+            </div>
+
+            <div class="mt-5 grid gap-3 sm:grid-cols-2">
+                <div class="rounded-2xl bg-mist/70 p-4">
+                    <p class="metric-label">Quantity</p>
+                    <p class="mt-2 font-display text-2xl font-bold text-soil">{{ order.quantity }} kg</p>
+                </div>
+                <div class="rounded-2xl bg-mist/70 p-4">
+                    <p class="metric-label">Amount</p>
+                    <p class="mt-2 font-display text-2xl font-bold text-soil">&#8377;{{ "%.2f"|format(order.total_price) }}</p>
+                </div>
+            </div>
+
+            {% if order.status == 'Delivered' %}
+            <div class="mt-5 rounded-[1.5rem] border border-soil/10 bg-white/70 p-4">
+                <p class="text-sm font-bold text-soil">Review this farmer</p>
+                <p class="mt-1 text-sm text-ink/62">Share feedback to strengthen trust in the network.</p>
+                <form action="{{ url_for('submit_review') }}" method="POST" class="mt-4 space-y-4">
+                    <input type="hidden" name="order_id" value="{{ order.id }}">
+                    <input type="hidden" name="farmer_id" value="{{ order.farmer_id }}">
+                    <div class="relative flex flex-row-reverse justify-end gap-1">
+                        {% for i in range(5, 0, -1) %}
+                        <input class="star-input" type="radio" name="rating" value="{{ i }}" id="rate-{{ order.id }}-{{ i }}" required>
+                        <label class="star-label text-xl" for="rate-{{ order.id }}-{{ i }}">
+                            <i class="fa-solid fa-star"></i>
+                        </label>
+                        {% endfor %}
+                    </div>
+                    <textarea name="comment" class="textarea-shell" placeholder="How was the product quality and delivery experience?"></textarea>
+                    <button type="submit" class="btn-primary-app w-full justify-center">
+                        Submit review
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+            {% endif %}
+        </article>
+        {% else %}
+        <div class="empty-state lg:col-span-2 xl:col-span-3">
+            <h3 class="font-display text-[2rem] font-bold text-soil">Your order archive is still empty</h3>
+            <p class="mx-auto mt-3 max-w-xl text-sm leading-6 text-ink/65 sm:text-base">Completed or cancelled orders
+                will move here automatically for future reference.</p>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

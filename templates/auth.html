@@ -1,0 +1,483 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
+    <aside
+        class="surface-panel reveal relative overflow-hidden px-5 py-6 sm:px-7 sm:py-8 lg:min-h-[36rem] lg:px-8 lg:py-9">
+        <div
+            class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(215,164,74,0.18),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(63,125,72,0.2),transparent_30%)]">
+        </div>
+        <div class="relative flex h-full flex-col justify-between">
+            <div>
+                <span class="section-kicker">
+                    <i class="fa-solid fa-leaf"></i>
+                    {% if mode == 'login' %}Farmer-first access{% elif mode == 'verify' %}Secure sign in{% else %}Join
+                    the network{% endif %}
+                </span>
+                <h1 class="mt-5 max-w-lg font-display text-3xl font-bold leading-tight text-soil sm:text-[2.7rem]">
+                    {% if mode == 'login' %}
+                    Log in with your registered email and continue where your market journey left off.
+                    {% elif mode == 'verify' %}
+                    Complete the OTP check to unlock your Smart Farmer workspace.
+                    {% else %}
+                    Create a modern farm marketplace identity built for trust, speed, and local reach.
+                    {% endif %}
+                </h1>
+                <p class="mt-4 max-w-xl text-sm leading-6 text-ink/70 sm:text-base">
+                    Smart Farmer connects growers and buyers through verified listings, direct fulfillment, and clean
+                    operational dashboards for every role.
+                </p>
+            </div>
+
+            <div class="mt-8 grid gap-3 sm:grid-cols-3">
+                <div class="metric-card">
+                    <p class="metric-label">Email access</p>
+                    <p class="metric-value">OTP</p>
+                    <p class="mt-2 text-sm text-ink/65">Secure email-first authentication for all roles.</p>
+                </div>
+                <div class="metric-card">
+                    <p class="metric-label">Verified growers</p>
+                    <p class="metric-value">100%</p>
+                    <p class="mt-2 text-sm text-ink/65">Visibility tools built around farm credibility and trust.</p>
+                </div>
+                <div class="metric-card">
+                    <p class="metric-label">Regional fit</p>
+                    <p class="metric-value">IN</p>
+                    <p class="mt-2 text-sm text-ink/65">India-focused marketplace copy, payments, and produce flow.</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <div class="auth-shell reveal rounded-[1.6rem] px-5 py-5 sm:px-7 sm:py-7 lg:px-8 lg:py-8">
+        <div class="mb-6 flex items-start justify-between gap-4">
+            <div>
+                <span class="section-kicker">
+                    {% if mode == 'login' %}
+                    Sign in
+                    {% elif mode == 'verify' %}
+                    Verify OTP
+                    {% else %}
+                    Registration
+                    {% endif %}
+                </span>
+                <h2 class="mt-3 font-display text-[1.9rem] font-bold text-soil">
+                    {% if mode == 'login' %}
+                    Welcome back
+                    {% elif mode == 'verify' %}
+                    One more step
+                    {% else %}
+                    Open your account
+                    {% endif %}
+                </h2>
+                <p class="mt-2 text-sm leading-6 text-ink/68">
+                    {% if mode == 'login' %}
+                    Use your registered email and password to continue.
+                    {% elif mode == 'verify' %}
+                    We sent a one-time code to your inbox. Use it here before it expires.
+                    {% else %}
+                    Set up your buyer or farmer identity with email, profile, and region details.
+                    {% endif %}
+                </p>
+            </div>
+            <div
+                class="hidden h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-soil via-leaf to-grain text-white shadow-soft sm:flex">
+                <i class="fa-solid {% if mode == 'verify' %}fa-shield-halved{% elif mode == 'register' %}fa-tractor{% else %}fa-seedling{% endif %} text-xl"></i>
+            </div>
+        </div>
+
+        {% if mode == 'verify' %}
+        <div id="otp-alert-banner"
+            class="mb-5 hidden rounded-[1.2rem] border border-[#d45b52]/20 bg-[#fff1ef] px-4 py-3 text-sm text-[#b94a42] shadow-[0_18px_40px_rgba(212,91,82,0.14)]">
+            <div class="flex items-start gap-3">
+                <span class="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#f8d9d4] text-[#c2524a]">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </span>
+                <div>
+                    <p class="font-bold uppercase tracking-[0.16em] text-[#b94a42]">Email delivery problem</p>
+                    <p id="otp-alert-text" class="mt-1 leading-6 text-[#a2433d]"></p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <form id="{% if mode == 'verify' %}verify-form{% elif mode == 'login' %}login-form{% else %}register-form{% endif %}" action="{{ url_for(mode) }}" method="POST" class="space-y-4">
+            {% if mode == 'login' %}
+            <div>
+                <label class="field-label" for="email">Registered email</label>
+                <input id="email" class="input-shell" type="email" name="email" placeholder="farmer@example.com"
+                    required>
+            </div>
+
+            <div>
+                <label class="field-label" for="login-password">Password</label>
+                <div class="relative">
+                    <input id="login-password" class="input-shell pr-12" type="password" name="password"
+                        placeholder="Enter your password" required>
+                    <button type="button" data-password-toggle="login-password"
+                        class="absolute right-3 top-1/2 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-xl text-ink/45 transition hover:bg-mist hover:text-soil">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-primary-app w-full">
+                Continue to OTP
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+            {% elif mode == 'verify' %}
+            <div>
+                <label class="field-label" for="email_verify">Registered email</label>
+                <input id="email_verify" class="input-shell bg-mist/80 text-ink/70" type="email" name="email"
+                    value="{{ email }}" readonly required>
+            </div>
+
+            <div class="rounded-[1.2rem] border border-soil/10 bg-mist/70 p-4">
+                <div class="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                        <p class="text-sm font-bold text-soil">Verification code</p>
+                        <p class="mt-1 text-sm text-ink/65">This code stays active for {{ otp_expiry_minutes }} minute{% if otp_expiry_minutes != 1 %}s{% endif %}. Check your inbox before requesting a new one.</p>
+                    </div>
+                    <span class="badge-app badge-info">
+                        <i class="fa-regular fa-clock"></i>
+                        <span id="timer_val">{{ otp_expiry_seconds }}</span>s
+                    </span>
+                </div>
+                <div class="mt-4">
+                    <label class="field-label" for="otp_input">Enter OTP</label>
+                    <input id="otp_input" class="input-shell otp-box" type="text" name="otp" maxlength="6"
+                        placeholder="000000" required disabled>
+                </div>
+                <p id="otp_status" class="mt-3 text-sm text-ink/60">Requesting your verification code...</p>
+                <button id="resend-otp-btn" type="button" class="btn-ghost-app mt-3 hidden px-0 text-sm font-bold">
+                    <i class="fa-solid fa-rotate-right"></i>
+                    Resend verification code
+                </button>
+            </div>
+
+            <button id="verify-submit-btn" type="submit" class="btn-primary-app w-full" disabled>
+                Complete sign in
+                <i class="fa-solid fa-shield-halved"></i>
+            </button>
+            {% else %}
+            <div class="grid gap-4 sm:grid-cols-2">
+                <div class="sm:col-span-2">
+                    <label class="field-label" for="full_name">Full name</label>
+                    <input id="full_name" class="input-shell" type="text" name="full_name"
+                        placeholder="Mahesh Reddy" required>
+                </div>
+                <div class="sm:col-span-2">
+                    <label class="field-label" for="email_register">Email address</label>
+                    <input id="email_register" class="input-shell" type="email" name="email"
+                        placeholder="mahesh@example.com" required>
+                </div>
+                <div>
+                    <label class="field-label" for="role">Joining as</label>
+                    <select id="role" class="select-shell" name="role" required>
+                        <option value="customer">Customer</option>
+                        <option value="farmer">Farmer</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="field-label" for="city">City</label>
+                    <input id="city" class="input-shell" type="text" name="city" placeholder="Hyderabad" required>
+                </div>
+                <div>
+                    <label class="field-label" for="state">State</label>
+                    <input id="state" class="input-shell" type="text" name="state" placeholder="Telangana">
+                </div>
+                <div>
+                    <label class="field-label" for="district">District</label>
+                    <input id="district" class="input-shell" type="text" name="district" placeholder="Nalgonda">
+                </div>
+                <div>
+                    <label class="field-label" for="pincode">Pincode</label>
+                    <input id="pincode" class="input-shell" type="text" name="pincode" placeholder="500001">
+                </div>
+                <div class="sm:col-span-2">
+                    <label class="field-label" for="username">Username</label>
+                    <input id="username" class="input-shell" type="text" name="username" placeholder="smartmahesh"
+                        required>
+                </div>
+                <div class="sm:col-span-2">
+                    <label class="field-label" for="register-password">Password</label>
+                    <div class="relative">
+                        <input id="register-password" class="input-shell pr-12" type="password" name="password"
+                            placeholder="Create a strong password" required>
+                        <button type="button" data-password-toggle="register-password"
+                            class="absolute right-3 top-1/2 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-xl text-ink/45 transition hover:bg-mist hover:text-soil">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-primary-app w-full">
+                Create account
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+            {% endif %}
+        </form>
+
+        <div class="mt-6 rounded-[1.2rem] border border-soil/8 bg-white/60 px-4 py-3.5 text-sm text-ink/68">
+            {% if mode == 'login' %}
+            New to Smart Farmer?
+            <a href="{{ url_for('register') }}" class="font-bold text-leaf">Create an account</a>
+            {% else %}
+            Already registered?
+            <a href="{{ url_for('login') }}" class="font-bold text-leaf">Go to sign in</a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+{% if mode == 'verify' %}
+<div id="otp-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-soil/45 px-4 backdrop-blur-sm">
+    <div class="w-full max-w-sm rounded-[1.6rem] bg-white p-5 shadow-bloom">
+        <div class="flex items-start justify-between gap-4">
+            <div>
+                <span class="section-kicker">
+                    <i class="fa-solid fa-envelope-open-text"></i>
+                    Inbox confirmation
+                </span>
+                <h3 class="mt-3 font-display text-[1.9rem] font-bold text-soil">Verification email sent</h3>
+                <p id="otp-modal-message" class="mt-2 text-sm leading-6 text-ink/66"></p>
+            </div>
+            <button id="otp-modal-close" type="button"
+                class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-mist text-soil">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="mt-5 rounded-[1.2rem] border border-soil/10 bg-mist/70 p-4 text-center">
+            <p class="text-xs font-extrabold uppercase tracking-[0.18em] text-ink/45">Email delivery</p>
+            <p id="otp-modal-code" class="mt-3 font-display text-4xl font-bold tracking-[0.14em] text-soil"></p>
+        </div>
+        <p class="mt-4 text-sm text-ink/62">Use the OTP from your inbox. This dialog only confirms that the message has been sent.</p>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{% if mode == 'verify' %}
+<script>
+    const verifyForm = document.getElementById('verify-form');
+    const emailVerifyInput = document.getElementById('email_verify');
+    const timerVal = document.getElementById('timer_val');
+    const otpStatus = document.getElementById('otp_status');
+    const otpInput = document.getElementById('otp_input');
+    const verifySubmitBtn = document.getElementById('verify-submit-btn');
+    const resendBtn = document.getElementById('resend-otp-btn');
+    const otpModal = document.getElementById('otp-modal');
+    const otpModalClose = document.getElementById('otp-modal-close');
+    const otpModalCode = document.getElementById('otp-modal-code');
+    const otpModalMessage = document.getElementById('otp-modal-message');
+    const otpAlertBanner = document.getElementById('otp-alert-banner');
+    const otpAlertText = document.getElementById('otp-alert-text');
+    let timeLeft = {{ otp_expiry_seconds }};
+    let timerId = null;
+    const deliveryErrorCodes = new Set([
+        'smtp_not_configured',
+        'smtp_auth_failed',
+        'recipient_rejected',
+        'sender_rejected',
+        'smtp_timeout',
+        'smtp_error',
+        'mail_delivery_failed',
+        'invalid_email_domain'
+    ]);
+
+    function setOtpStatus(message, tone = 'neutral') {
+        otpStatus.textContent = message;
+        otpStatus.classList.remove('text-ink/60', 'text-ink/65', 'text-leaf', 'text-[#c2524a]');
+        if (tone === 'success') {
+            otpStatus.classList.add('text-leaf');
+        } else if (tone === 'error') {
+            otpStatus.classList.add('text-[#c2524a]');
+        } else {
+            otpStatus.classList.add('text-ink/60');
+        }
+    }
+
+    function setOtpAlert(message = '', visible = false) {
+        otpAlertText.textContent = message;
+        otpAlertBanner.classList.toggle('hidden', !visible);
+    }
+
+    function setVerifyAvailability(enabled) {
+        otpInput.disabled = !enabled;
+        verifySubmitBtn.disabled = !enabled;
+    }
+
+    async function readJsonResponse(response) {
+        try {
+            const payload = await response.json();
+            return {
+                success: typeof payload.success === 'boolean' ? payload.success : response.ok,
+                message: payload.message || (response.ok
+                    ? 'Request completed.'
+                    : 'Unexpected server response. Please try again.'),
+                error_code: Object.prototype.hasOwnProperty.call(payload, 'error_code')
+                    ? payload.error_code
+                    : (response.ok ? null : 'server_error'),
+                redirect: payload.redirect || null,
+                otp: Object.prototype.hasOwnProperty.call(payload, 'otp') ? payload.otp : null
+            };
+        } catch (error) {
+            return {
+                success: false,
+                message: 'Unexpected server response. Please try again.',
+                error_code: 'bad_response',
+                redirect: null,
+                otp: null
+            };
+        }
+    }
+
+    function isDeliveryFailure(data, response) {
+        const message = (data.message || '').toLowerCase();
+        return !data.success && (
+            deliveryErrorCodes.has(data.error_code) ||
+            response.status >= 500 ||
+            message.includes('otp email') ||
+            message.includes('smtp') ||
+            message.includes('delivery') ||
+            message.includes('inbox')
+        );
+    }
+
+    async function fetchWithTimeout(url, options, timeoutMs = 15000) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+        try {
+            return await fetch(url, { ...options, signal: controller.signal });
+        } finally {
+            clearTimeout(timeoutId);
+        }
+    }
+
+    function openOtpModal(message, otp) {
+        otpModalMessage.textContent = message;
+        otpModalCode.textContent = otp || 'Check inbox';
+        otpModal.classList.remove('hidden');
+        otpModal.classList.add('flex');
+    }
+
+    function closeOtpModal() {
+        otpModal.classList.add('hidden');
+        otpModal.classList.remove('flex');
+    }
+
+    function startTimer() {
+        timeLeft = {{ otp_expiry_seconds }};
+        resendBtn.classList.add('hidden');
+        setVerifyAvailability(true);
+        if (timerId) {
+            clearInterval(timerId);
+        }
+
+        timerVal.textContent = timeLeft;
+        timerId = setInterval(() => {
+            timeLeft -= 1;
+            timerVal.textContent = timeLeft;
+
+            if (timeLeft <= 0) {
+                clearInterval(timerId);
+                resendBtn.classList.remove('hidden');
+            }
+        }, 1000);
+    }
+
+    async function requestOtp() {
+        const email = emailVerifyInput.value;
+        setVerifyAvailability(false);
+        resendBtn.classList.add('hidden');
+        setOtpAlert('', false);
+        setOtpStatus('Requesting a fresh verification code...');
+
+        const response = await fetchWithTimeout('/request_otp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `email=${encodeURIComponent(email)}`
+        });
+        const data = await readJsonResponse(response);
+        setOtpAlert(data.message, isDeliveryFailure(data, response));
+        setOtpStatus(data.message, data.success ? 'success' : 'error');
+
+        if (response.ok && data.success) {
+            openOtpModal(data.message, data.otp);
+            startTimer();
+            return;
+        }
+
+        setVerifyAvailability(false);
+    }
+
+    async function submitVerify(event) {
+        event.preventDefault();
+        const otp = otpInput.value.trim();
+
+        if (!otp) {
+            setOtpAlert('', false);
+            setOtpStatus('Enter the 6-digit OTP to continue.', 'error');
+            return;
+        }
+
+        setOtpAlert('', false);
+        verifySubmitBtn.disabled = true;
+        verifySubmitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifying';
+
+        try {
+            const formData = new FormData();
+            formData.append('email', emailVerifyInput.value);
+            formData.append('otp', otp);
+            formData.append('response_mode', 'json');
+
+            const response = await fetchWithTimeout('{{ url_for("verify") }}', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await readJsonResponse(response);
+            setOtpAlert(data.message, isDeliveryFailure(data, response));
+            setOtpStatus(data.message, data.success ? 'success' : 'error');
+
+            if (response.ok && data.success && data.redirect) {
+                window.location.href = data.redirect;
+                return;
+            }
+        } catch (error) {
+            setOtpAlert('', false);
+            setOtpStatus(error && error.name === 'AbortError'
+                ? 'OTP verification timed out. Please try again.'
+                : 'Unable to verify OTP right now. Please try again.', 'error');
+        } finally {
+            verifySubmitBtn.disabled = false;
+            verifySubmitBtn.innerHTML = 'Complete sign in <i class="fa-solid fa-shield-halved"></i>';
+        }
+    }
+
+    setVerifyAvailability(false);
+    requestOtp().catch((error) => {
+        setOtpAlert('The server could not complete the email delivery request. Check SMTP settings and try again.', true);
+        setOtpStatus(error && error.name === 'AbortError'
+            ? 'OTP delivery timed out. Please try again.'
+            : 'Unable to request OTP right now. Please try again.', 'error');
+    });
+    verifyForm.addEventListener('submit', submitVerify);
+    resendBtn.addEventListener('click', () => {
+        requestOtp().catch((error) => {
+            setOtpAlert('The server could not complete the email delivery request. Check SMTP settings and try again.', true);
+            setOtpStatus(error && error.name === 'AbortError'
+                ? 'OTP delivery timed out. Please try again.'
+                : 'Unable to request OTP right now. Please try again.', 'error');
+        });
+    });
+    otpModalClose.addEventListener('click', closeOtpModal);
+    otpModal.addEventListener('click', (event) => {
+        if (event.target === otpModal) {
+            closeOtpModal();
+        }
+    });
+</script>
+{% endif %}
+{% endblock %}

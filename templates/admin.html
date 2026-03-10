@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="surface-panel reveal rounded-[1.8rem] px-5 py-6 sm:px-7 sm:py-8">
+    <span class="section-kicker">
+        <i class="fa-solid fa-shield-halved"></i>
+        Legacy fallback
+    </span>
+    <h1 class="mt-4 font-display text-3xl font-bold text-soil sm:text-[2.7rem]">Admin overview</h1>
+    <p class="mt-3 max-w-2xl text-sm leading-6 text-ink/70">This legacy template stays visually aligned with the new
+        system while the main admin route uses the richer command-center layout.</p>
+
+    <div class="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div class="metric-card">
+            <p class="metric-label">Farmers</p>
+            <p class="metric-value">{{ total_farmers }}</p>
+        </div>
+        <div class="metric-card">
+            <p class="metric-label">Listings</p>
+            <p class="metric-value">{{ total_crops }}</p>
+        </div>
+        <div class="metric-card">
+            <p class="metric-label">Orders</p>
+            <p class="metric-value">{{ total_orders }}</p>
+        </div>
+        <div class="metric-card">
+            <p class="metric-label">Revenue</p>
+            <p class="metric-value">&#8377;{{ "%.0f"|format(total_revenue) }}</p>
+        </div>
+    </div>
+</section>
+
+<section class="mt-6 grid gap-6">
+    <div class="surface-card reveal p-5 sm:p-6">
+        <span class="section-kicker">
+            <i class="fa-solid fa-seedling"></i>
+            Inventory
+        </span>
+        <h2 class="mt-3 font-display text-[1.9rem] font-bold text-soil">Global harvest registry</h2>
+        <div class="mt-6 surface-table">
+            <table class="table-shell">
+                <thead>
+                    <tr>
+                        <th>Crop</th>
+                        <th>Farmer</th>
+                        <th>Stock</th>
+                        <th>Price</th>
+                        <th>Category</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for crop in crops %}
+                    <tr>
+                        <td data-label="Crop">{{ crop.name }}</td>
+                        <td data-label="Farmer">{{ crop.farmer_name }}</td>
+                        <td data-label="Stock">{{ crop.quantity }} kg</td>
+                        <td data-label="Price">&#8377;{{ crop.price }}/unit</td>
+                        <td data-label="Category">{{ crop.category or 'General' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="surface-card reveal p-5 sm:p-6">
+        <span class="section-kicker">
+            <i class="fa-solid fa-address-book"></i>
+            Directory
+        </span>
+        <h2 class="mt-3 font-display text-[1.9rem] font-bold text-soil">User and partner directory</h2>
+        <div class="mt-6 surface-table">
+            <table class="table-shell">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Role</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td data-label="Name">{{ user.full_name }}</td>
+                        <td data-label="Role">{{ user.role }}</td>
+                        <td data-label="Email">{{ user.email }}</td>
+                        <td data-label="Status">
+                            {% if user.role == 'farmer' %}
+                            {% if user.is_verified %}Verified{% else %}Pending{% endif %}
+                            {% else %}
+                            Standard
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}

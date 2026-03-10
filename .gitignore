@@ -1,0 +1,33 @@
+instance/
+__pycache__/
+*.py[cod]
+*$py.class
+.env
+.env.local
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+market.db
+*.db
+.flaskenv
+*.log
+.coverage
+.pytest_cache/
+.mypy_cache/
+dist/
+build/
+node_modules/
+.DS_Store
+
+# Project specific
+static/uploads/*
+!static/uploads/.gitkeep
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo

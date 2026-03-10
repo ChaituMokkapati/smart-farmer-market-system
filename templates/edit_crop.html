@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="mx-auto max-w-3xl">
+    <div class="surface-panel reveal rounded-[1.8rem] px-5 py-6 sm:px-7 sm:py-8">
+        <span class="section-kicker">
+            <i class="fa-solid fa-pen"></i>
+            Edit listing
+        </span>
+        <h1 class="mt-4 font-display text-3xl font-bold text-soil sm:text-[2.7rem]">Refine your harvest details</h1>
+        <p class="mt-3 max-w-2xl text-sm leading-6 text-ink/70">Update the listing to improve discoverability,
+            pricing clarity, and buyer confidence without changing the existing backend flow.</p>
+
+        <form action="{{ url_for('edit_crop', id=crop.id) }}" method="POST" class="mt-6 space-y-4">
+            <div>
+                <label class="field-label" for="name">Harvest name</label>
+                <input id="name" class="input-shell" type="text" name="name" value="{{ crop.name }}" required>
+            </div>
+
+            <div class="grid gap-4 sm:grid-cols-2">
+                <div>
+                    <label class="field-label" for="quantity">Stock (kg)</label>
+                    <input id="quantity" class="input-shell" type="number" step="0.1" name="quantity"
+                        value="{{ crop.quantity }}" required>
+                </div>
+                <div>
+                    <label class="field-label" for="price">Price per unit</label>
+                    <input id="price" class="input-shell" type="number" step="0.01" name="price" value="{{ crop.price }}"
+                        required>
+                </div>
+            </div>
+
+            <div>
+                <label class="field-label" for="description">Description and notes</label>
+                <textarea id="description" class="textarea-shell" name="description"
+                    placeholder="Share freshness notes, quality highlights, and storage details.">{{ crop.description }}</textarea>
+            </div>
+
+            <div class="flex flex-col gap-3 sm:flex-row">
+                <button type="submit" class="btn-primary-app flex-1 justify-center">
+                    Save changes
+                    <i class="fa-solid fa-floppy-disk"></i>
+                </button>
+                <a href="{{ url_for('farmer_dashboard') }}" class="btn-outline-app flex-1 justify-center">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Back to dashboard
+                </a>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

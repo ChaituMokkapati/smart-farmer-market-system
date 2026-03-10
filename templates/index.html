@@ -1,0 +1,245 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="grid gap-6 lg:grid-cols-[1.25fr_0.95fr]">
+    <div class="hero-shell reveal rounded-[1.8rem] px-5 py-6 sm:px-7 sm:py-8 lg:px-8 lg:py-9">
+        <span class="section-kicker">
+            <i class="fa-solid fa-wheat-awn"></i>
+            {{ welcome_msg }} to the network
+        </span>
+        <h1 class="mt-5 max-w-3xl font-display text-3xl font-bold leading-tight text-soil sm:text-[2.7rem] lg:text-[3.4rem]">
+            Discover trusted local harvests, sourced directly from growers across India.
+        </h1>
+        <p class="mt-4 max-w-2xl text-sm leading-6 text-ink/72 sm:text-base">
+            Browse region-aware crop listings, compare verified farmer profiles, and order fresh produce through a
+            marketplace designed for transparent farm-to-home commerce.
+        </p>
+
+        <div class="mt-8 flex flex-wrap gap-3">
+            <span class="badge-app badge-success"><i class="fa-solid fa-badge-check"></i> Verified growers</span>
+            <span class="badge-app badge-info"><i class="fa-solid fa-location-dot"></i> Regional discovery</span>
+            <span class="badge-app badge-warning"><i class="fa-solid fa-truck"></i> Live order tracking</span>
+        </div>
+
+        <div class="mt-8 grid gap-3 sm:grid-cols-3">
+            <div class="metric-card">
+                <p class="metric-label">Live listings</p>
+                <p class="metric-value">{{ crops|length }}</p>
+                <p class="mt-2 text-sm text-ink/64">Fresh products visible with direct farmer identity.</p>
+            </div>
+            <div class="metric-card">
+                <p class="metric-label">States active</p>
+                <p class="metric-value">{{ states|length }}</p>
+                <p class="mt-2 text-sm text-ink/64">Search by region to source from nearby or preferred zones.</p>
+            </div>
+            <div class="metric-card">
+                <p class="metric-label">Categories</p>
+                <p class="metric-value">{{ categories|length }}</p>
+                <p class="mt-2 text-sm text-ink/64">Produce, grains, dairy, organics, and more.</p>
+            </div>
+        </div>
+    </div>
+
+    <aside class="surface-panel reveal rounded-[1.8rem] px-5 py-5 sm:px-6 sm:py-6">
+        <div class="flex items-start justify-between gap-4">
+            <div>
+                <span class="section-kicker">
+                    <i class="fa-solid fa-sliders"></i>
+                    Search harvests
+                </span>
+                <h2 class="mt-3 font-display text-[1.9rem] font-bold text-soil">Filter the market</h2>
+                <p class="mt-2 text-sm leading-6 text-ink/68">Match by crop, category, state, and district with one
+                    clean search panel.</p>
+            </div>
+            <div class="hidden rounded-2xl bg-grain/15 px-3 py-2 text-sm font-bold text-soil sm:block">Smart search
+            </div>
+        </div>
+
+        <form action="{{ url_for('marketplace') }}" method="GET" class="mt-6 grid gap-4">
+            <div>
+                <label class="field-label" for="query">Search products</label>
+                <input id="query" class="input-shell" type="text" name="query"
+                    placeholder="Tomatoes, rice, honey, organic vegetables" value="{{ query or '' }}">
+            </div>
+            <div class="grid gap-4 sm:grid-cols-2">
+                <div>
+                    <label class="field-label" for="category">Category</label>
+                    <select id="category" class="select-shell" name="category">
+                        <option value="">All categories</option>
+                        {% for cat in categories %}
+                        <option value="{{ cat }}" {% if category==cat %}selected{% endif %}>{{ cat }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="field-label" for="state-select">State</label>
+                    <select id="state-select" class="select-shell" name="state">
+                        <option value="">All states</option>
+                        {% for s in states %}
+                        <option value="{{ s }}" {% if state==s %}selected{% endif %}>{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div>
+                <label class="field-label" for="district-select">District</label>
+                <select id="district-select" class="select-shell" name="district">
+                    <option value="">All districts</option>
+                </select>
+            </div>
+            <div class="grid gap-3 sm:grid-cols-[1fr_auto]">
+                <button type="submit" class="btn-primary-app">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    Explore listings
+                </button>
+                {% if query or state or district or category %}
+                <a href="{{ url_for('marketplace') }}" class="btn-outline-app justify-center">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    Reset
+                </a>
+                {% endif %}
+            </div>
+        </form>
+    </aside>
+</section>
+
+<section class="mt-8 reveal">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+            <span class="section-kicker">
+                <i class="fa-solid fa-basket-shopping"></i>
+                Marketplace
+            </span>
+            <h2 class="mt-3 font-display text-[1.95rem] font-bold text-soil sm:text-[2.25rem]">Fresh listings ready to order</h2>
+            <p class="mt-2 max-w-2xl text-sm leading-6 text-ink/68 sm:text-base">Every card highlights farm origin,
+                stock, category, and direct purchase controls.</p>
+        </div>
+        <div class="rounded-full border border-soil/10 bg-white/70 px-4 py-2 text-sm font-semibold text-ink/70">
+            {{ crops|length }} result{% if crops|length != 1 %}s{% endif %}
+        </div>
+    </div>
+
+    <div class="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        {% for crop in crops %}
+        <article class="surface-card reveal overflow-hidden p-4">
+            <div class="relative">
+                {% if crop.image_url %}
+                <img src="{{ url_for('static', filename=crop.image_url) }}" alt="{{ crop.name }}" class="crop-thumb">
+                {% else %}
+                <div
+                    class="flex aspect-[4/3] w-full items-center justify-center rounded-[1.4rem] bg-mist text-4xl text-leaf/45">
+                    <i class="fa-solid fa-seedling"></i>
+                </div>
+                {% endif %}
+                <div class="absolute left-4 top-4 flex flex-wrap gap-2">
+                    <span class="badge-app badge-neutral">{{ crop.category or 'General' }}</span>
+                    {% if crop.is_verified %}
+                    <span class="badge-app badge-success"><i class="fa-solid fa-badge-check"></i> Verified</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="mt-4 flex items-start justify-between gap-4">
+                <div>
+                    <h3 class="font-display text-[1.45rem] font-bold text-soil">{{ crop.name }}</h3>
+                    <p class="mt-1 text-sm font-semibold text-ink/62">
+                        <i class="fa-solid fa-location-dot text-leaf"></i>
+                        {{ crop.village or crop.farmer_city or 'Local source' }}, {{ crop.district or crop.state }}
+                    </p>
+                </div>
+                <div class="text-right">
+                    <p class="text-xs font-bold uppercase tracking-[0.2em] text-ink/45">Price</p>
+                    <p class="font-display text-[2rem] font-bold text-soil">&#8377;{{ crop.price }}</p>
+                </div>
+            </div>
+
+            <div class="mt-4 flex flex-wrap gap-2">
+                {% if crop.quality %}
+                <span class="badge-app badge-warning"><i class="fa-solid fa-award"></i> {{ crop.quality }}</span>
+                {% endif %}
+                <span class="badge-app badge-info"><i class="fa-solid fa-boxes-stacked"></i> {{ crop.quantity }} kg
+                    available</span>
+            </div>
+
+            <div class="mt-5 rounded-[1.3rem] bg-mist/70 p-4">
+                <a href="{{ url_for('farmer_profile', id=crop.farmer_id) }}"
+                    class="flex items-center gap-3 text-sm text-ink/75 transition hover:text-soil">
+                    <div
+                        class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-leaf to-soil font-bold text-white">
+                        {{ crop.farmer_name[0] }}
+                    </div>
+                    <div>
+                        <p class="font-bold text-soil">{{ crop.farmer_name }}</p>
+                        <p>Farmer profile and trust details</p>
+                    </div>
+                </a>
+            </div>
+
+            <form action="{{ url_for('place_order') }}" method="POST" class="mt-5 grid gap-3 sm:grid-cols-[0.7fr_1.3fr]">
+                <input type="hidden" name="crop_id" value="{{ crop.id }}">
+                <div>
+                    <label class="field-label" for="quantity-{{ crop.id }}">Qty (kg)</label>
+                    <input id="quantity-{{ crop.id }}" class="input-shell" type="number" name="quantity" min="0.1"
+                        step="0.1" value="1">
+                </div>
+                <div class="self-end">
+                    <button type="submit" class="btn-primary-app w-full">
+                        Buy now
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </form>
+        </article>
+        {% else %}
+        <div class="empty-state md:col-span-2 xl:col-span-3">
+            <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-mist text-2xl text-leaf/55">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </div>
+            <h3 class="mt-5 font-display text-[2rem] font-bold text-soil">No crops matched your search</h3>
+            <p class="mx-auto mt-3 max-w-xl text-sm leading-6 text-ink/65 sm:text-base">Try adjusting the region or
+                category filters, or remove search terms to explore more nearby harvests.</p>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const locationData = {
+        "Telangana": ["Hyderabad", "Warangal", "Karimnagar", "Nizamabad", "Khammam", "Adilabad", "Nalgonda"],
+        "Andhra Pradesh": ["Krishna", "Guntur", "East Godavari", "West Godavari", "Nellore", "Chittoor", "Visakhapatnam"],
+        "Karnataka": ["Bengaluru", "Mysuru", "Hubballi", "Dharwad", "Mangaluru", "Belagavi"],
+        "Tamil Nadu": ["Chennai", "Coimbatore", "Madurai", "Tiruchirappalli", "Salem", "Tirunelveli"],
+        "Maharashtra": ["Mumbai", "Pune", "Nagpur", "Thane", "Nashik", "Aurangabad"],
+        "Kerala": ["Thiruvananthapuram", "Kochi", "Kozhikode", "Thrissur", "Malappuram"],
+        "Odisha": ["Bhubaneswar", "Cuttack", "Rourkela", "Berhampur", "Sambalpur"]
+    };
+
+    const stateSelect = document.getElementById('state-select');
+    const districtSelect = document.getElementById('district-select');
+    const currentDistrict = "{{ district or '' }}";
+
+    function updateDistricts() {
+        const selectedState = stateSelect.value;
+        districtSelect.innerHTML = '<option value="">All districts</option>';
+
+        if (selectedState && locationData[selectedState]) {
+            locationData[selectedState].forEach((district) => {
+                const option = document.createElement('option');
+                option.value = district;
+                option.textContent = district;
+                if (district === currentDistrict) {
+                    option.selected = true;
+                }
+                districtSelect.appendChild(option);
+            });
+        }
+    }
+
+    stateSelect.addEventListener('change', updateDistricts);
+    if (stateSelect.value) {
+        updateDistricts();
+    }
+</script>
+{% endblock %}
