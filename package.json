@@ -1,0 +1,19 @@
+{
+  "name": "smart-farmer-market-system",
+  "version": "1.0.0",
+  "description": "[![Python](https://img.shields.io/badge/Python-3.8%2B-blue.svg)](https://www.python.org/)\r [![Flask](https://img.shields.io/badge/Flask-3.0.0-green.svg)](https://flask.palletsprojects.com/)\r [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "body-parser": "^2.2.2",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "fast2sms": "^1.0.3"
+  }
+}

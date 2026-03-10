@@ -1,0 +1,774 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+
+    :root {
+        --admin-bg: #f1f5f9;
+        --admin-card: #ffffff;
+        --admin-accent: #3b82f6;
+        --admin-accent-bright: #2563eb;
+        --admin-success: #10b981;
+        --admin-warning: #f59e0b;
+        --admin-danger: #ef4444;
+        --glass-border: #e2e8f0;
+        --sidebar-width: 280px;
+        --sidebar-collapsed-width: 80px;
+        --text-bright: #0f172a;
+        --text-dim: #64748b;
+        --glow: 0 4px 12px rgba(59, 130, 246, 0.2);
+    }
+
+    body {
+        background-color: var(--admin-bg);
+        color: var(--text-bright);
+        font-family: 'Poppins', sans-serif;
+        overflow-x: hidden;
+    }
+
+    .admin-wrapper {
+        display: flex;
+        min-height: 100vh;
+        margin: -2rem;
+        /* Sync with base layout */
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Sidebar Refinements */
+    .sidebar {
+        width: var(--sidebar-width);
+        background: #ffffff;
+        border-right: 1px solid var(--glass-border);
+        padding: 2.5rem 1.25rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1000;
+        overflow-y: auto;
+    }
+
+    .sidebar.collapsed {
+        width: var(--sidebar-collapsed-width);
+    }
+
+    .sidebar.collapsed .sidebar-text,
+    .sidebar.collapsed .sidebar-header-text {
+        display: none;
+    }
+
+    .sidebar-link {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 14px 18px;
+        color: var(--text-dim);
+        text-decoration: none;
+        border-radius: 14px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid transparent;
+    }
+
+    /* Light colored sidebar buttons as requested */
+    .sidebar-link {
+        background: transparent;
+    }
+
+    .sidebar-link i {
+        font-size: 1.25rem;
+        width: 28px;
+        display: flex;
+        justify-content: center;
+        transition: all 0.3s;
+        color: var(--text-dim);
+    }
+
+    .sidebar-link:hover {
+        background: #f8fafc;
+        color: var(--admin-accent);
+        transform: translateX(5px);
+    }
+
+    .sidebar-link.active {
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--admin-accent);
+        border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+
+    .sidebar-link.active i {
+        color: var(--admin-accent);
+    }
+
+    /* Main Content Area */
+    .main-panel {
+        flex: 1;
+        padding: 3rem 4rem;
+        overflow-y: auto;
+        min-width: 0;
+    }
+
+    /* Bright Texts */
+    h1,
+    h2,
+    h3,
+    .stat-value {
+        color: var(--text-bright) !important;
+        letter-spacing: -0.5px;
+    }
+
+    .highlight-cyan {
+        color: var(--admin-accent-bright);
+    }
+
+    /* Layout Components */
+    .top-nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #ffffff;
+        padding: 1.5rem 4rem;
+        margin: -3rem -4rem 3rem -4rem;
+        border-bottom: 1px solid var(--glass-border);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+    }
+
+    .search-bar-v2 {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 10px 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: 400px;
+        transition: all 0.3s;
+    }
+
+    .search-bar-v2:focus-within {
+        background: rgba(255, 255, 255, 0.07);
+        border-color: var(--admin-accent);
+        box-shadow: var(--glow);
+    }
+
+    .search-bar-v2 input {
+        background: transparent;
+        border: none;
+        color: var(--text-bright);
+        width: 100%;
+        outline: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .search-bar-v2 input::placeholder {
+        color: var(--text-dim);
+    }
+
+    /* Collapsible Trigger */
+    .collapse-btn {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--glass-border);
+        color: white;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        position: absolute;
+        right: -16px;
+        top: 2.5rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1001;
+        transition: all 0.3s;
+    }
+
+    .collapse-btn:hover {
+        background: var(--admin-accent);
+        color: #0f172a;
+    }
+
+    /* Stats & Cards */
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 2rem;
+        margin-bottom: 4rem;
+    }
+
+    .stat-card-v2 {
+        background: #ffffff;
+        border-radius: 20px;
+        padding: 1.5rem;
+        border: 1px solid #f1f5f9;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        transition: all 0.3s;
+    }
+
+    .stat-card-v2:hover {
+        transform: translateY(-8px);
+        border-color: rgba(56, 189, 248, 0.3);
+    }
+
+    /* Table Improvements */
+    .table-container-v2 {
+        background: var(--admin-card);
+        border-radius: 28px;
+        border: 1px solid var(--glass-border);
+        margin-top: 2rem;
+        overflow-x: auto;
+    }
+
+    .modern-table th {
+        color: var(--admin-accent-bright);
+        font-weight: 800;
+        font-size: 0.8rem;
+    }
+
+    .modern-table td {
+        border-top: 1px solid #f1f5f9;
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: var(--text-bright);
+    }
+
+    @media (max-width: 1200px) {
+        .stats-row {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .sidebar {
+            position: fixed;
+            transform: translateX(-100%);
+            width: 280px;
+        }
+
+        .sidebar.active {
+            transform: translateX(0);
+        }
+
+        .main-panel {
+            padding: 2rem;
+        }
+
+        .stats-row {
+            grid-template-columns: 1fr;
+        }
+
+        .search-bar-v2 {
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .top-nav {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+    }
+</style>
+
+<div class="admin-wrapper" id="admin-root">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <button class="collapse-btn" onclick="toggleSidebar()">
+            <i class="fas fa-chevron-left" id="collapse-icon"></i>
+        </button>
+
+        <div style="margin-bottom: 4rem; padding: 0 1rem;">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div
+                    style="width: 45px; height: 45px; background: var(--admin-accent); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #0f172a; font-weight: 900; font-size: 1.5rem; box-shadow: var(--glow);">
+                    S</div>
+                <div class="sidebar-header-text">
+                    <h2
+                        style="color: var(--text-bright); font-weight: 950; letter-spacing: -1.5px; margin: 0; font-size: 1.5rem;">
+                        SMART FIELD</h2>
+                    <p
+                        style="font-size: 0.6rem; color: var(--admin-accent); font-weight: 800; text-transform: uppercase; letter-spacing: 2px;">
+                        COMMAND OS 2.1</p>
+                </div>
+            </div>
+        </div>
+
+        <nav style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <a href="{{ url_for('admin_dashboard') }}" class="sidebar-link active">
+                <i class="fas fa-chart-pie"></i>
+                <span class="sidebar-text">Dashboard</span>
+            </a>
+            <a href="#farmers-section" class="sidebar-link">
+                <i class="fas fa-user-gear"></i>
+                <span class="sidebar-text">Farmers</span>
+            </a>
+            <a href="#inventory-section" class="sidebar-link">
+                <i class="fas fa-seedling"></i>
+                <span class="sidebar-text">Market Inventory</span>
+            </a>
+            <a href="#orders-section" class="sidebar-link">
+                <i class="fas fa-box-open"></i>
+                <span class="sidebar-text">Orders</span>
+            </a>
+            <a href="#payments-section" class="sidebar-link">
+                <i class="fas fa-credit-card"></i>
+                <span class="sidebar-text">Payments</span>
+            </a>
+            <a href="#delivery-section" class="sidebar-link">
+                <i class="fas fa-truck-ramp-box"></i>
+                <span class="sidebar-text">Delivery / Logistics</span>
+            </a>
+            <a href="#reports-section" class="sidebar-link">
+                <i class="fas fa-file-invoice"></i>
+                <span class="sidebar-text">Reports</span>
+            </a>
+            <a href="#settings-section" class="sidebar-link">
+                <i class="fas fa-sliders-h"></i>
+                <span class="sidebar-text">Settings</span>
+            </a>
+        </nav>
+
+        <div style="margin-top: auto; padding-top: 2rem; border-top: 1px solid rgba(255, 255, 255, 0.05);">
+            <a href="{{ url_for('logout') }}" class="sidebar-link"
+                style="background: rgba(239, 68, 68, 0.1); color: var(--admin-danger);">
+                <i class="fas fa-power-off"></i>
+                <span class="sidebar-text">Terminate Access</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-panel">
+        <header class="top-nav animate-up">
+            <div>
+                <div>
+                    <h1
+                        style="font-weight: 950; font-size: 2.25rem; color: var(--text-bright) !important; letter-spacing: -1px;">
+                        Admin Command Center</h1>
+                    <p style="color: var(--text-dim) !important; font-weight: 600; font-size: 1rem;">
+                        Secure Multi-Node Management Interface</p>
+                </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 2.5rem;">
+                <div class="search-bar-v2">
+                    <i class="fas fa-magnifying-glass" style="color: var(--admin-accent-bright);"></i>
+                    <input type="text" placeholder="Scan system records...">
+                </div>
+
+                <div
+                    style="display: flex; align-items: center; gap: 12px; background: #f8fafc; padding: 8px 16px; border-radius: 12px; border: 1px solid #e2e8f0;">
+                    <div
+                        style="width: 36px; height: 36px; background: var(--admin-accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 900; color: white;">
+                        A</div>
+                    <div>
+                        <div style="font-weight: 800; font-size: 0.9rem; color: var(--text-bright) !important;">
+                            ROOT_ADMIN</div>
+                        <div style="font-size: 0.65rem; color: var(--text-dim) !important; font-weight: 700;">
+                            VERIFIED IDENTITY
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Stats Row -->
+        <div class="stats-row">
+            <div class="stat-card-v2 animate-up" style="animation-delay: 0.1s;">
+                <div
+                    style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
+                    <div
+                        style="width: 54px; height: 54px; background: rgba(56, 189, 248, 0.1); border-radius: 16px; display: flex; align-items: center; justify-content: center; color: var(--admin-accent);">
+                        <i class="fas fa-tractor fa-xl"></i>
+                    </div>
+                    <span
+                        style="background: rgba(16, 185, 129, 0.1); color: var(--admin-success); padding: 4px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 800;">+14.2%</span>
+                </div>
+                <h3 style="font-size: 2.5rem; font-weight: 900; margin: 0;">{{ total_farmers }}</h3>
+                <p
+                    style="color: var(--text-dim); font-weight: 700; margin-top: 5px; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px;">
+                    Registered Farmers</p>
+            </div>
+
+            <div class="stat-card-v2 animate-up" style="animation-delay: 0.2s;">
+                <div
+                    style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
+                    <div
+                        style="width: 54px; height: 54px; background: rgba(16, 185, 129, 0.1); border-radius: 16px; display: flex; align-items: center; justify-content: center; color: var(--admin-success);">
+                        <i class="fas fa-wheat-awn fa-xl"></i>
+                    </div>
+                    <span
+                        style="background: rgba(56, 189, 248, 0.1); color: var(--admin-accent); padding: 4px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 800;">STABLE</span>
+                </div>
+                <h3 style="font-size: 2.5rem; font-weight: 900; margin: 0;">{{ total_crops }}</h3>
+                <p
+                    style="color: var(--text-dim); font-weight: 700; margin-top: 5px; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px;">
+                    Live Products</p>
+            </div>
+
+            <div class="stat-card-v2 animate-up" style="animation-delay: 0.3s;">
+                <div
+                    style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
+                    <div
+                        style="width: 54px; height: 54px; background: rgba(245, 158, 11, 0.1); border-radius: 16px; display: flex; align-items: center; justify-content: center; color: var(--admin-warning);">
+                        <i class="fas fa-truck-fast fa-xl"></i>
+                    </div>
+                    <span
+                        style="background: rgba(16, 185, 129, 0.1); color: var(--admin-success); padding: 4px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 800;">+8%</span>
+                </div>
+                <h3 style="font-size: 2.5rem; font-weight: 900; margin: 0;">{{ total_orders }}</h3>
+                <p
+                    style="color: var(--text-dim); font-weight: 700; margin-top: 5px; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px;">
+                    Active Streams</p>
+            </div>
+
+            <div class="stat-card-v2 animate-up" style="animation-delay: 0.4s;">
+                <div
+                    style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
+                    <div
+                        style="width: 54px; height: 54px; background: rgba(16, 185, 129, 0.1); border-radius: 16px; display: flex; align-items: center; justify-content: center; color: var(--admin-success);">
+                        <i class="fas fa-indian-rupee-sign fa-xl"></i>
+                    </div>
+                    <span
+                        style="background: rgba(16, 185, 129, 0.1); color: var(--admin-success); padding: 4px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 800;">+21%</span>
+                </div>
+                <h3 style="font-size: 2.5rem; font-weight: 900; margin: 0; color: var(--text-bright) !important;">{{
+                    "%.0f"|format(total_revenue) }}</h3>
+                <p
+                    style="color: var(--text-dim); font-weight: 700; margin-top: 5px; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px;">
+                    Total Revenue</p>
+            </div>
+        </div>
+
+        <div class="charts-row">
+            <div class="chart-card animate-up" style="animation-delay: 0.5s;">
+                <h3 style="font-weight: 850; font-size: 1.5rem; margin-bottom: 2rem;">Economic Data Map</h3>
+                <canvas id="mainChart" height="280"></canvas>
+            </div>
+            <div class="chart-card animate-up" style="animation-delay: 0.6s;">
+                <h3 style="font-weight: 850; font-size: 1.5rem; margin-bottom: 2rem;">Sector Analysis</h3>
+                <canvas id="categoryChart" height="280"></canvas>
+            </div>
+        </div>
+
+        <!-- Farmers Registry Section -->
+        <section id="farmers-section" class="animate-up" style="animation-delay: 0.65s; margin-top: 4rem;">
+            <div style="margin-bottom: 2rem;">
+                <h2 style="font-weight: 950; font-size: 2.25rem;">Authorized Farmers</h2>
+                <p style="color: var(--admin-accent-bright); font-weight: 700;">Global Provider Node Management</p>
+            </div>
+
+            <div class="table-container-v2">
+                <table class="modern-table" style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="text-align: left;">
+                            <th style="padding: 1.5rem;">Farmer Node</th>
+                            <th style="padding: 1.5rem;">Origin</th>
+                            <th style="padding: 1.5rem;">Network ID</th>
+                            <th style="padding: 1.5rem;">Verified</th>
+                            <th style="padding: 1.5rem; text-align: center;">Command</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users if user.role == 'farmer' %}
+                        <td style="padding: 1.5rem;">
+                            <div style="font-weight: 800; color: var(--text-bright);">{{ user.full_name }}</div>
+                            <div style="font-size: 0.7rem; color: var(--text-dim);">@{{ user.username }}</div>
+                        </td>
+                        <td style="padding: 1.5rem; font-weight: 700; color: var(--text-dim);">{{ user.city }}, {{
+                            user.state }}</td>
+                        <td style="padding: 1.5rem; font-weight: 700; color: var(--text-bright);">#USR-{{ user.id }}
+                        </td>
+                        <td style="padding: 1.5rem;">
+                            {% if user.is_verified %}
+                            <span
+                                style="background: rgba(16, 185, 129, 0.1); color: var(--admin-success); padding: 4px 12px; border-radius: 8px; font-weight: 800; font-size: 0.75rem;">SECURE</span>
+                            {% else %}
+                            <span
+                                style="background: rgba(245, 158, 11, 0.1); color: var(--admin-warning); padding: 4px 12px; border-radius: 8px; font-weight: 800; font-size: 0.75rem;">UNVERIFIED</span>
+                            {% endif %}
+                        </td>
+                        <td style="padding: 1.5rem; text-align: center;">
+                            <div style="display: flex; gap: 12px; justify-content: center;">
+                                <a href="{{ url_for('toggle_verification', user_id=user.id) }}"
+                                    title="Toggle Security Clearance"
+                                    style="width: 40px; height: 40px; background: rgba(56, 189, 248, 0.1); color: var(--admin-accent); display: flex; align-items: center; justify-content: center; border-radius: 12px; text-decoration: none; border: 1px solid rgba(56, 189, 248, 0.2); transition: all 0.3s;"><i
+                                        class="fas fa-shield-check"></i></a>
+                                <a href="{{ url_for('delete_user', id=user.id) }}" title="Purge Node"
+                                    style="width: 40px; height: 40px; background: rgba(239, 68, 68, 0.1); color: var(--admin-danger); display: flex; align-items: center; justify-content: center; border-radius: 12px; text-decoration: none; border: 1px solid rgba(239, 68, 68, 0.2); transition: all 0.3s;"
+                                    onclick="return confirm('Purge farmer node from network?')"><i
+                                        class="fas fa-user-slash"></i></a>
+                            </div>
+                        </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Inventory Registry Section -->
+        <section id="inventory-section" class="animate-up" style="animation-delay: 0.7s; margin-top: 4rem;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem;">
+                <div>
+                    <h2 style="font-weight: 950; font-size: 2.25rem;">Market Inventory Registry</h2>
+                    <p style="color: var(--admin-accent-bright); font-weight: 700;">Full System-Wide Access</p>
+                </div>
+                <button class="btn-admin"
+                    style="width: auto; padding: 12px 24px; background: var(--admin-accent); color: #0f172a; margin: 0;">
+                    <i class="fas fa-file-export"></i> Global Report
+                </button>
+            </div>
+
+            <div class="table-container-v2">
+                <table class="modern-table" style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="text-align: left;">
+                            <th style="padding: 1.5rem;">Crop Image</th>
+                            <th style="padding: 1.5rem;">Crop Name</th>
+                            <th style="padding: 1.5rem;">Farmer Name</th>
+                            <th style="padding: 1.5rem;">Stock (KG)</th>
+                            <th style="padding: 1.5rem;">Price per KG</th>
+                            <th style="padding: 1.5rem;">Category</th>
+                            <th style="padding: 1.5rem; text-align: center;">Command</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for crop in crops %}
+                        <tr>
+                            <td style="padding: 1.5rem;">
+                                {% if crop.image_url %}
+                                <img src="{{ url_for('static', filename=crop.image_url) }}"
+                                    style="width: 45px; height: 45px; border-radius: 8px; object-fit: cover; border: 1px solid #e2e8f0;">
+                                {% else %}
+                                <div
+                                    style="width: 45px; height: 45px; background: #f1f5f9; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #94a3b8;">
+                                    <i class="fas fa-image"></i>
+                                </div>
+                                {% endif %}
+                            </td>
+                            <td style="padding: 1.5rem;">
+                                <div style="font-weight: 800; color: var(--text-bright);">{{ crop.name }}</div>
+                                <div
+                                    style="font-size: 0.7rem; color: var(--admin-accent); font-weight: 800; text-transform: uppercase;">
+                                    ID #CRP-{{ crop.id }}</div>
+                            </td>
+                            <td style="padding: 1.5rem; font-weight: 700; color: var(--text-dim);">{{ crop.farmer_name
+                                }}</td>
+                            <td style="padding: 1.5rem;">
+                                <div style="font-weight: 800; color: var(--text-bright);">{{ crop.quantity }} <span
+                                        style="font-size: 0.7rem; color: var(--text-dim);">KG</span></div>
+                            </td>
+                            <td style="padding: 1.5rem;">
+                                <div style="font-weight: 900; color: var(--admin-accent);">₹{{ crop.price }}</div>
+                            </td>
+                            <td style="padding: 1.5rem;">
+                                <span
+                                    style="background: #f1f5f9; color: var(--text-dim); padding: 6px 14px; border-radius: 8px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase;">
+                                    {{ crop.category or 'General' }}
+                                </span>
+                            </td>
+                            <td style="padding: 1.5rem; text-align: center;">
+                                <div style="display: flex; gap: 12px; justify-content: center;">
+                                    <a href="{{ url_for('edit_crop', id=crop.id) }}"
+                                        style="width: 40px; height: 40px; background: rgba(56, 189, 248, 0.1); color: var(--admin-accent); display: flex; align-items: center; justify-content: center; border-radius: 12px; text-decoration: none; border: 1px solid rgba(56, 189, 248, 0.2); transition: all 0.3s;"><i
+                                            class="fas fa-sliders-h"></i></a>
+                                    <a href="{{ url_for('delete_crop', id=crop.id) }}"
+                                        style="width: 40px; height: 40px; background: rgba(239, 68, 68, 0.1); color: var(--admin-danger); display: flex; align-items: center; justify-content: center; border-radius: 12px; text-decoration: none; border: 1px solid rgba(239, 68, 68, 0.2); transition: all 0.3s;"
+                                        onclick="return confirm('Purge record from system?')"><i
+                                            class="fas fa-trash-can"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Order Streams Section -->
+        <section id="orders-section" class="animate-up" style="animation-delay: 0.75s; margin-top: 4rem;">
+            <div style="margin-bottom: 2rem;">
+                <h2 style="font-weight: 950; font-size: 2.25rem;">Global Order Streams</h2>
+                <p style="color: var(--admin-accent-bright); font-weight: 700;">Live Network Transaction Monitoring</p>
+            </div>
+
+            <div class="table-container-v2">
+                <table class="modern-table" style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="text-align: left;">
+                            <th style="padding: 1.5rem;">Order Link</th>
+                            <th style="padding: 1.5rem;">Entity Source</th>
+                            <th style="padding: 1.5rem;">Product Node</th>
+                            <th style="padding: 1.5rem;">Value</th>
+                            <th style="padding: 1.5rem;">Status</th>
+                            <th style="padding: 1.5rem; text-align: center;">Command</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr>
+                            <td style="padding: 1.5rem; font-weight: 800; color: var(--text-bright);">#ORD-{{ order.id
+                                }}</td>
+                            <td style="padding: 1.5rem; font-weight: 700; color: var(--text-dim);">{{
+                                order.customer_name }}</td>
+                            <td style="padding: 1.5rem; font-weight: 700; color: var(--text-bright);">{{ order.crop_name
+                                }}</td>
+                            <td style="padding: 1.5rem; font-weight: 900; color: var(--admin-accent);">₹{{
+                                order.total_price }}</td>
+                            <td style="padding: 1.5rem;">
+                                <form action="{{ url_for('admin_update_order', id=order.id) }}" method="POST"
+                                    style="display: inline-flex; gap: 10px;">
+                                    <select name="status" class="input-v2"
+                                        style="background: rgba(255,255,255,0.05); padding: 5px 10px; border-radius: 8px; font-size: 0.75rem; color: white; border: 1px solid rgba(255,255,255,0.1);">
+                                        <option value="pending" {% if order.status=='pending' %}selected{% endif %}>
+                                            Pending</option>
+                                        <option value="Paid" {% if order.status=='Paid' %}selected{% endif %}>Paid
+                                        </option>
+                                        <option value="Shipped" {% if order.status=='Shipped' %}selected{% endif %}>
+                                            Shipped</option>
+                                        <option value="Delivered" {% if order.status=='Delivered' %}selected{% endif %}>
+                                            Delivered</option>
+                                        <option value="Cancelled" {% if order.status=='Cancelled' %}selected{% endif %}>
+                                            Cancelled</option>
+                                    </select>
+                                    <button type="submit" class="btn-admin"
+                                        style="width: auto; padding: 5px 10px; font-size: 0.7rem; margin: 0;">Update</button>
+                                </form>
+                            </td>
+                            <td style="padding: 1.5rem; text-align: center;">
+                                <div style="display: flex; gap: 12px; justify-content: center;">
+                                    <span
+                                        style="color: var(--text-bright); font-size: 0.8rem; font-weight: 600;">ACTIVE_STREAM</span>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Placeholder Sections for Anchors -->
+        <section id="payments-section"
+            style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.05);">
+            <h2 style="font-weight: 950; font-size: 2.25rem;">Payment Gateway</h2>
+            <p style="color: var(--text-dim);">Financial Settlement Layer Integration</p>
+            <div
+                style="background: var(--admin-card); padding: 2rem; border-radius: 20px; text-align: center; color: var(--text-dim);">
+                Secure Payment Streams are monitoring active transactions. No manual intervention required.
+            </div>
+        </section>
+
+        <section id="delivery-section"
+            style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.05);">
+            <h2 style="font-weight: 950; font-size: 2.25rem;">Logistics & Delivery</h2>
+            <p style="color: var(--text-dim);">Supply Chain Node Tracking</p>
+            <div
+                style="background: var(--admin-card); padding: 2rem; border-radius: 20px; text-align: center; color: var(--text-dim);">
+                Real-time logistics tracking is managed via active order streams.
+            </div>
+        </section>
+
+        <section id="reports-section"
+            style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.05);">
+            <h2 style="font-weight: 950; font-size: 2.25rem;">Intelligence Reports</h2>
+            <p style="color: var(--text-dim);">Analytical Insights & System Logs</p>
+            <div
+                style="background: var(--admin-card); padding: 2rem; border-radius: 20px; text-align: center; color: var(--text-dim);">
+                System is generating real-time performance metrics in the Economic Data Map above.
+            </div>
+        </section>
+
+        <section id="settings-section"
+            style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.05); margin-bottom: 4rem;">
+            <h2 style="font-weight: 950; font-size: 2.25rem;">System Settings</h2>
+            <p style="color: var(--text-dim);">Core OS Configuration</p>
+            <div
+                style="background: var(--admin-card); padding: 2rem; border-radius: 20px; text-align: center; color: var(--text-dim);">
+                Root configurations are currently locked for maximum security.
+            </div>
+        </section>
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const icon = document.getElementById('collapse-icon');
+        sidebar.classList.toggle('collapsed');
+        if (sidebar.classList.contains('collapsed')) {
+            icon.classList.replace('fa-chevron-left', 'fa-chevron-right');
+        } else {
+            icon.classList.replace('fa-chevron-right', 'fa-chevron-left');
+        }
+    }
+
+    // Revenue Map
+    const ctx = document.getElementById('mainChart').getContext('2d');
+    const revenueLabels = [{% for item in revenue_trend[:: -1] %}'{{ item[0] }}', {% endfor %}];
+    const revenueData = [{% for item in revenue_trend[:: -1] %}{ { item[1] } }, {% endfor %}];
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: revenueLabels.length > 0 ? revenueLabels : ['INITIAL'],
+            datasets: [{
+                label: 'Market Weight (₹)',
+                data: revenueData.length > 0 ? revenueData : [0],
+                borderColor: '#38bdf8',
+                backgroundColor: 'rgba(56, 189, 248, 0.1)',
+                borderWidth: 5,
+                fill: true,
+                tension: 0.5,
+                pointRadius: 6,
+                pointBackgroundColor: '#38bdf8'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8', font: { weight: '700' } } },
+                x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { weight: '700' } } }
+            }
+        }
+    });
+
+    // Category Intensity
+    const categoryLabels = [{% for item in category_counts %}'{{ item[0] }}', {% endfor %}];
+    const categoryData = [{% for item in category_counts %}{ { item[1] } }, {% endfor %}];
+
+    new Chart(document.getElementById('categoryChart').getContext('2d'), {
+        type: 'doughnut',
+        data: {
+            labels: categoryLabels.length > 0 ? categoryLabels : ['None'],
+            datasets: [{
+                data: categoryData.length > 0 ? categoryData : [1],
+                backgroundColor: ['#38bdf8', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#06b6d4'],
+                borderWidth: 0,
+                hoverOffset: 20
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { color: '#64748b', font: { weight: '700', family: 'Poppins' }, padding: 30, usePointStyle: true }
+                }
+            },
+            cutout: '75%'
+        }
+    });
+</script>
+{% endblock %}

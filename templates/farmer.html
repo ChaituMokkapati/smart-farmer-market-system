@@ -1,0 +1,302 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="animate" style="margin-bottom: 4rem;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 2rem;">
+        <div>
+            <h1 style="margin-bottom: 0.5rem;">Farmer Dashboard</h1>
+            <p style="color: var(--text-muted); font-weight: 500;">Manage your harvest, track orders, and grow your
+                reach.</p>
+        </div>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            {% if is_verified %}
+            <span class="badge badge-paid"
+                style="padding: 0.75rem 1.5rem; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; border-radius: 12px;">
+                <i class="fas fa-check-circle"></i> VERIFIED PARTNER
+            </span>
+            {% else %}
+            <span class="badge badge-pending"
+                style="padding: 0.75rem 1.5rem; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; border-radius: 12px;">
+                <i class="fas fa-clock"></i> VERIFICATION PENDING
+            </span>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 2fr; gap: 3rem; align-items: start;">
+    <!-- Add Crop Section -->
+    <div class="animate">
+        <div class="card">
+            <h2 style="font-size: 1.5rem; margin-bottom: 2rem; color: var(--primary);">List New Harvest</h2>
+            <form action="{{ url_for('add_crop') }}" method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label>Product Name</label>
+                    <input type="text" name="name" placeholder="e.g. Sona Masuri Rice" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Category</label>
+                    <select name="category" id="category_select" required>
+                        <option value="Vegetables">Vegetables</option>
+                        <option value="Fruits">Fruits</option>
+                        <option value="Grains">Grains</option>
+                        <option value="Rice Varieties">Rice Varieties</option>
+                        <option value="Pulses">Pulses</option>
+                        <option value="Spices">Spices</option>
+                        <option value="Dairy Products">Dairy Products</option>
+                        <option value="Milk">Milk</option>
+                        <option value="Eggs">Eggs</option>
+                        <option value="Meat">Meat</option>
+                        <option value="Honey">Honey</option>
+                        <option value="Organic Products">Organic Products</option>
+                        <option value="Farming Products">Farming Products</option>
+                        <option value="Others">Others</option>
+                    </select>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Location (State)</label>
+                        <select name="state" required>
+                            <option value="Telangana">Telangana</option>
+                            <option value="Andhra Pradesh">Andhra Pradesh</option>
+                            <option value="Karnataka">Karnataka</option>
+                            <option value="Tamil Nadu">Tamil Nadu</option>
+                            <option value="Maharashtra">Maharashtra</option>
+                            <option value="Kerala">Kerala</option>
+                            <option value="Odisha">Odisha</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>District</label>
+                        <input type="text" name="district" placeholder="Guntur" required>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Village</label>
+                        <input type="text" name="village" placeholder="Amaravati" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Pincode</label>
+                        <input type="text" name="pincode" placeholder="522001" required>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Quantity</label>
+                        <input type="number" name="quantity" step="0.1" placeholder="100 kg" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Harvest Date</label>
+                        <input type="date" name="harvest_date" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Price (₹ per unit)</label>
+                    <input type="number" name="price" id="product_price" step="0.01" placeholder="50.00" required>
+                    <div id="price_suggestion"
+                        style="background: var(--bg-main); padding: 0.75rem; border-radius: 10px; border-left: 4px solid var(--primary-accent); margin-top: -0.5rem; margin-bottom: 1.5rem; font-size: 0.8rem; font-weight: 600; color: var(--primary);">
+                        Select a category for price advice
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Quality Grade</label>
+                    <select name="quality" required>
+                        <option value="A-Grade (Export)">A-Grade (Export Quality)</option>
+                        <option value="B-Grade (Premium)">B-Grade (Premium)</option>
+                        <option value="Organic Certified">Organic Certified</option>
+                        <option value="Standard">Standard</option>
+                    </select>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Crop Media</label>
+                        <input type="file" name="image" id="crop_image" accept="image/*" class="file-input">
+                    </div>
+                    <div class="form-group">
+                        <label>Quality Proof</label>
+                        <input type="file" name="quality_proof" id="quality_proof" accept="image/*" class="file-input"
+                            required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea name="description" rows="3" placeholder="Notes about freshness, variety, etc."></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Post to Marketplace</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Manage Crops Section -->
+    <div class="animate">
+        <div style="margin-bottom: 3rem;">
+            <h2 style="font-size: 1.5rem; margin-bottom: 1.5rem;">Active Harvest Registry</h2>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Harvest Detail</th>
+                            <th>Current Inventory</th>
+                            <th>Pricing</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for crop in crops %}
+                        <tr>
+                            <td>
+                                <div style="font-weight: 700; color: var(--primary);">{{ crop.name }}</div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted);">{{ crop.category }}</div>
+                            </td>
+                            <td style="font-weight: 600;">{{ crop.quantity }} kg</td>
+                            <td style="font-weight: 700;">₹{{ crop.price }}</td>
+                            <td>
+                                <div style="display: flex; gap: 1rem;">
+                                    <a href="{{ url_for('edit_crop', id=crop.id) }}"
+                                        style="color: var(--primary-accent);"><i class="fas fa-pen-nib"></i></a>
+                                    <a href="{{ url_for('delete_crop', id=crop.id) }}" style="color: #ef4444;"
+                                        onclick="return confirm('Archive this listing?')"><i
+                                            class="fas fa-trash-alt"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" style="text-align: center; padding: 4rem; color: var(--text-muted);">
+                                <i class="fas fa-tractor fa-3x"
+                                    style="opacity: 0.1; margin-bottom: 1rem; display: block;"></i>
+                                No active listings yet. Reach thousands of customers by adding your first crop!
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Incoming Orders Section -->
+        <h2 style="font-size: 1.5rem; margin-bottom: 1.5rem;">Recent Incoming Orders</h2>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Order & Customer</th>
+                        <th>Volume & Value</th>
+                        <th>Current Status</th>
+                        <th>Management</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td>
+                            <div style="font-weight: 700;">#{{ order.id }} - {{ order.crop_name }}</div>
+                            <div style="font-size: 0.75rem; color: var(--primary-accent);">
+                                <i class="fas fa-user"></i> {{ order.customer_name }}
+                            </div>
+                        </td>
+                        <td>
+                            <div style="font-weight: 600;">{{ order.quantity }} kg</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">Total: ₹{{
+                                "%.2f"|format(order.total_price) }}</div>
+                        </td>
+                        <td>
+                            <span class="badge badge-{{ order.status|lower|replace(' ', '-') }}">{{ order.status
+                                }}</span>
+                        </td>
+                        <td>
+                            {% if order.status not in ['Delivered', 'Cancelled'] %}
+                            <form action="{{ url_for('farmer_update_order') }}" method="POST"
+                                style="display: flex; gap: 8px;">
+                                <input type="hidden" name="order_id" value="{{ order.id }}">
+                                <select name="status"
+                                    style="padding: 0.5rem; font-size: 0.75rem; margin: 0; min-width: 120px;" required>
+                                    <option value="" disabled selected>Update</option>
+                                    <option value="Order Confirmed">Confirm</option>
+                                    <option value="Packed">Packed</option>
+                                    <option value="Shipped">Shipped</option>
+                                    <option value="Out for Delivery">Out</option>
+                                    <option value="Delivered">Delivered</option>
+                                </select>
+                                <button type="submit" class="btn btn-primary"
+                                    style="padding: 0.5rem 0.75rem; font-size: 0.75rem;"><i
+                                        class="fas fa-check"></i></button>
+                            </form>
+                            {% else %}
+                            <span style="color: var(--text-muted); font-size: 0.8rem; font-weight: 600;">Managed</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" style="text-align: center; padding: 4rem; color: var(--text-muted);">
+                            <i class="fas fa-clipboard-list fa-3x"
+                                style="opacity: 0.1; margin-bottom: 1rem; display: block;"></i>
+                            Your orders will appear here once customers start buying.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    // File validation
+    const fileInputs = document.querySelectorAll('.file-input');
+    const MAX_SIZE = 2 * 1024 * 1024; // 2MB
+
+    fileInputs.forEach(input => {
+        input.addEventListener('change', function () {
+            if (this.files && this.files[0] && this.files[0].size > MAX_SIZE) {
+                alert("File is too large! Maximum allowed size is 2MB.");
+                this.value = "";
+            }
+        });
+    });
+
+    // Price Suggestion Logic
+    const categorySelect = document.getElementById('category_select');
+    const priceInput = document.getElementById('product_price');
+    const suggestionText = document.getElementById('price_suggestion');
+
+    const marketPrices = {
+        'Vegetables': { min: 20, max: 60 },
+        'Fruits': { min: 40, max: 200 },
+        'Grains': { min: 30, max: 100 },
+        'Rice Varieties': { min: 50, max: 120 },
+        'Pulses': { min: 90, max: 150 },
+        'Spices': { min: 100, max: 500 },
+        'Dairy Products': { min: 200, max: 600 },
+        'Milk': { min: 60, max: 80 },
+        'Eggs': { min: 5, max: 10 },
+        'Meat': { min: 200, max: 800 },
+        'Honey': { min: 300, max: 600 },
+        'Organic Products': { min: 100, max: 1000 },
+        'Farming Products': { min: 50, max: 5000 },
+        'Others': { min: 1, max: 10000 }
+    };
+
+    function updateSuggestion() {
+        const cat = categorySelect.value;
+        if (marketPrices[cat]) {
+            const range = marketPrices[cat];
+            suggestionText.innerHTML = `<i class="fas fa-lightbulb"></i> Market range: ₹${range.min} - ₹${range.max}. <span style="opacity: 0.7">Suggested: ₹${Math.floor((range.min + range.max) / 2)}</span>`;
+        }
+    }
+
+    categorySelect.addEventListener('change', updateSuggestion);
+    updateSuggestion();
+</script>
+{% endblock %}

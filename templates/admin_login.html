@@ -1,0 +1,380 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    :root {
+        --admin-bg: #0f172a;
+        --admin-card: rgba(30, 41, 59, 0.7);
+        --admin-accent: #38bdf8;
+        --admin-glow: rgba(56, 189, 248, 0.5);
+    }
+
+    body {
+        background-color: var(--admin-bg);
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .admin-login-container {
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+    }
+
+    .admin-login-card {
+        background: var(--admin-card);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 24px;
+        padding: 3rem;
+        width: 100%;
+        max-width: 450px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        text-align: center;
+    }
+
+    .admin-logo {
+        width: 80px;
+        height: 80px;
+        background: rgba(56, 189, 248, 0.1);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 2rem;
+        color: var(--admin-accent);
+        font-size: 2rem;
+        border: 1px solid rgba(56, 189, 248, 0.2);
+        box-shadow: 0 0 20px rgba(56, 189, 248, 0.1);
+    }
+
+    .admin-title {
+        color: #f1f5f9;
+        font-weight: 800;
+        font-size: 1.75rem;
+        letter-spacing: -1px;
+        margin-bottom: 0.5rem;
+    }
+
+    .admin-subtitle {
+        color: #94a3b8;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 2.5rem;
+    }
+
+    .input-group-v2 {
+        margin-bottom: 1.5rem;
+        text-align: left;
+    }
+
+    .input-group-v2 label {
+        display: block;
+        color: #cbd5e1;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 8px;
+        padding-left: 4px;
+    }
+
+    .input-v2 {
+        width: 100%;
+        background: #f8fafc;
+        /* Soft white/light grey */
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        border-radius: 12px;
+        padding: 14px 18px;
+        color: #000000 !important;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        outline: none;
+        display: block;
+        opacity: 1 !important;
+        -webkit-text-fill-color: #000000 !important;
+    }
+
+    .input-v2::placeholder {
+        color: #64748b !important;
+        opacity: 0.7;
+    }
+
+    .input-v2:focus {
+        background: #ffffff;
+        border-color: var(--admin-accent);
+        box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.1), 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .password-wrapper {
+        position: relative;
+        display: block;
+    }
+
+    .password-toggle {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #64748b;
+        /* Darker toggle for light bg */
+        cursor: pointer;
+        padding: 5px;
+        font-size: 1.1rem;
+        transition: color 0.3s;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .password-toggle:hover {
+        color: var(--admin-accent);
+    }
+
+    .btn-admin {
+        width: 100%;
+        padding: 14px;
+        border-radius: 12px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        cursor: pointer;
+        transition: all 0.3s;
+        border: none;
+        margin-top: 1rem;
+    }
+
+    .btn-send-otp {
+        background: var(--admin-accent);
+        color: #0f172a;
+        border: 1px solid var(--admin-accent);
+    }
+
+    .btn-send-otp:hover {
+        background: #7dd3fc;
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(56, 189, 248, 0.3);
+        border-color: #7dd3fc;
+    }
+
+    .btn-verify-identity {
+        background: rgba(56, 189, 248, 0.1);
+        color: var(--admin-accent);
+        border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+
+    .btn-verify-identity:hover {
+        background: var(--admin-accent);
+        color: #0f172a;
+        box-shadow: 0 10px 20px rgba(56, 189, 248, 0.2);
+    }
+
+    #otp-section {
+        display: none;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .otp-input-container {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        margin: 1.5rem 0;
+    }
+
+    .otp-digit {
+        width: 45px;
+        height: 55px;
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        text-align: center;
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: var(--admin-accent);
+    }
+</style>
+
+<div class="admin-login-container animate">
+    <div class="admin-login-card">
+        <div class="admin-logo">
+            <i class="fas fa-shield-halved"></i>
+        </div>
+
+        <h1 class="admin-title">System Entry</h1>
+        <p class="admin-subtitle">Secure Gateway for Authorized Personnel</p>
+
+        <form id="login-form">
+            <div id="credentials-section">
+                <div class="input-group-v2">
+                    <label>Admin ID</label>
+                    <input type="text" id="username" class="input-v2" placeholder="e.g. admin" autocomplete="username"
+                        required>
+                </div>
+
+                <div class="input-group-v2">
+                    <label>Admin Password</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="password" class="input-v2" placeholder="••••••••"
+                            autocomplete="current-password" required>
+                        <button type="button" class="password-toggle" onclick="togglePasswordVisibility()">
+                            <i class="fas fa-eye" id="eye-icon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="button" onclick="sendOTP()" id="btn-send" class="btn-admin btn-send-otp">
+                    Verify & Issue Security OTP
+                </button>
+            </div>
+
+            <div id="otp-section">
+                <div class="input-group-v2">
+                    <label>Verification Code</label>
+                    <input type="text" id="otp" class="input-v2" placeholder="6-Digit OTP" maxlength="6"
+                        style="text-align: center; font-size: 1.5rem; letter-spacing: 8px;">
+                </div>
+
+                <button type="button" onclick="verifyOTP()" id="btn-verify" class="btn-admin btn-verify-identity">
+                    Finalize Identity Verification
+                </button>
+
+                <p style="color: #64748b; font-size: 0.75rem; margin-top: 1.5rem; font-weight: 600;">
+                    Code expires in <span id="timer" style="color: var(--admin-accent);">60</span>s
+                </p>
+            </div>
+        </form>
+
+        <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid rgba(255, 255, 255, 0.05);">
+            <a href="{{ url_for('index') }}"
+                style="color: #64748b; text-decoration: none; font-size: 0.8rem; font-weight: 700; transition: color 0.3s;">
+                <i class="fas fa-arrow-left"></i> Return to Marketplace
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    function togglePasswordVisibility() {
+        const passwordInput = document.getElementById('password');
+        const eyeIcon = document.getElementById('eye-icon');
+
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            eyeIcon.classList.replace('fa-eye', 'fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            eyeIcon.classList.replace('fa-eye-slash', 'fa-eye');
+        }
+    }
+
+    async function sendOTP() {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const btn = document.getElementById('btn-send');
+
+        if (!username || !password) {
+            alert('Admin ID and Password are required');
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+        try {
+            const formData = new FormData();
+            formData.append('action', 'send_otp');
+            formData.append('username', username);
+            formData.append('phone', password); // Backend currently expects 'phone' key for password
+
+            const response = await fetch("{{ url_for('admin_login') }}", {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                document.getElementById('credentials-section').style.display = 'none';
+                document.getElementById('otp-section').style.display = 'block';
+                startTimer();
+                alert(result.message);
+            } else {
+                alert(result.message);
+                document.getElementById('password').value = ''; // Clear password on error
+                btn.disabled = false;
+                btn.innerText = 'Verify & Issue Security OTP';
+            }
+        } catch (error) {
+            console.error(error);
+            btn.disabled = false;
+            btn.innerText = 'Verify & Issue Security OTP';
+        }
+    }
+
+    async function verifyOTP() {
+        const otp = document.getElementById('otp').value;
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const btn = document.getElementById('btn-verify');
+
+        if (!otp) {
+            alert('Please enter the 6-digit verification code');
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Authenticating...';
+
+        try {
+            const formData = new FormData();
+            formData.append('action', 'verify');
+            formData.append('username', username);
+            formData.append('phone', password);
+            formData.append('otp', otp);
+
+            const response = await fetch("{{ url_for('admin_login') }}", {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                window.location.href = result.redirect;
+            } else {
+                alert(result.message);
+                btn.disabled = false;
+                btn.innerText = 'Finalize Identity Verification';
+            }
+        } catch (error) {
+            console.error(error);
+            btn.disabled = false;
+            btn.innerText = 'Finalize Identity Verification';
+        }
+    }
+
+    let timerInterval;
+    function startTimer() {
+        let timeLeft = 60;
+        const display = document.getElementById('timer');
+        clearInterval(timerInterval);
+
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            display.innerText = timeLeft;
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                display.parentElement.innerHTML = '<a href="javascript:void(0)" onclick="sendOTP()" style="color: var(--admin-accent); text-decoration: none;">Resend Security OTP</a>';
+            }
+        }, 1000);
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="auth-wrapper animate">
+    <div class="auth-card" style="max-width: 500px;">
+        <div class="auth-header">
+            <h2 style="font-weight: 900; letter-spacing: -0.5px; margin: 0; color: var(--primary);">Refine Harvest</h2>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem; font-weight: 600;">Update your
+                listing details for better visibility.</p>
+        </div>
+
+        <form action="{{ url_for('edit_crop', id=crop.id) }}" method="POST">
+            <div class="form-group">
+                <label>Harvest Name</label>
+                <input type="text" name="name" value="{{ crop.name }}" required>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                <div class="form-group">
+                    <label>Stock (kg)</label>
+                    <input type="number" name="quantity" step="0.1" value="{{ crop.quantity }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Price (₹ / unit)</label>
+                    <input type="number" name="price" step="0.01" value="{{ crop.price }}" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Description & Notes</label>
+                <textarea name="description" rows="5"
+                    placeholder="Share more about your product...">{{ crop.description }}</textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary"
+                style="width: 100%; padding: 1.1rem; font-weight: 800; border-radius: 12px; margin-top: 1rem;">
+                Save Changes
+            </button>
+            <a href="{{ url_for('farmer_dashboard') }}"
+                style="display: block; text-align: center; margin-top: 1.5rem; color: var(--text-muted); font-weight: 700; text-decoration: none; font-size: 0.9rem; transition: color 0.3s;"
+                onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-muted)'">
+                Discard Updates
+            </a>
+        </form>
+    </div>
+</div>
+{% endblock %}

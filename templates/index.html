@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero animate">
+    <div style="text-align: center; margin-bottom: 2rem;">
+        <span class="category-pill" style="font-size: 0.9rem; padding: 0.6rem 1.5rem;">
+            {{ welcome_msg }} to Smart Farmer Market
+        </span>
+    </div>
+    <h1 style="text-align: center;">Direct from Soil to Table</h1>
+    <p
+        style="text-align: center; max-width: 700px; margin: 0 auto 3rem; color: var(--text-muted); font-size: 1.15rem; font-weight: 500;">
+        Connecting you with authentic farmers across India. Experience the purity of local harvesting, delivered
+        straight to your home.
+    </p>
+</section>
+
+<div class="search-container animate"
+    style="margin-top: -2rem; padding: 2rem; border-radius: var(--radius-xl); background: white; box-shadow: var(--shadow-lg);">
+    <form action="{{ url_for('marketplace') }}" method="GET"
+        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; align-items: end;">
+        <div style="grid-column: span 2;">
+            <label>Search Products</label>
+            <input type="text" name="query" placeholder="What are you looking for today?" value="{{ query or '' }}"
+                style="margin-bottom: 0;">
+        </div>
+
+        <div>
+            <label>Category</label>
+            <select name="category" style="margin-bottom: 0;">
+                <option value="">All Categories</option>
+                {% for cat in categories %}
+                <option value="{{ cat }}" {% if category==cat %}selected{% endif %}>{{ cat }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div>
+            <label>State</label>
+            <select name="state" id="state-select" style="margin-bottom: 0;">
+                <option value="">All States</option>
+                {% for s in states %}
+                <option value="{{ s }}" {% if state==s %}selected{% endif %}>{{ s }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div>
+            <label>District</label>
+            <select name="district" id="district-select" style="margin-bottom: 0;">
+                <option value="">All Districts</option>
+            </select>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+            <button type="submit" class="btn btn-primary" style="flex: 1;">Explore</button>
+            {% if query or state or district or category %}
+            <a href="{{ url_for('marketplace') }}" class="btn btn-outline" style="padding: 0.8rem 1rem;"><i
+                    class="fas fa-undo"></i></a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<script>
+    const locationData = {
+        "Telangana": ["Hyderabad", "Warangal", "Karimnagar", "Nizamabad", "Khammam", "Adilabad", "Nalgonda"],
+        "Andhra Pradesh": ["Krishna", "Guntur", "East Godavari", "West Godavari", "Nellore", "Chittoor", "Visakhapatnam"],
+        "Karnataka": ["Bengaluru", "Mysuru", "Hubballi", "Dharwad", "Mangaluru", "Belagavi"],
+        "Tamil Nadu": ["Chennai", "Coimbatore", "Madurai", "Tiruchirappalli", "Salem", "Tirunelveli"],
+        "Maharashtra": ["Mumbai", "Pune", "Nagpur", "Thane", "Nashik", "Aurangabad"],
+        "Kerala": ["Thiruvananthapuram", "Kochi", "Kozhikode", "Thrissur", "Malappuram"],
+        "Odisha": ["Bhubaneswar", "Cuttack", "Rourkela", "Berhampur", "Sambalpur"]
+    };
+
+    const stateSelect = document.getElementById('state-select');
+    const districtSelect = document.getElementById('district-select');
+    const currentDistrict = "{{ district or '' }}";
+
+    function updateDistricts() {
+        const state = stateSelect.value;
+        districtSelect.innerHTML = '<option value="">All Districts</option>';
+
+        if (state && locationData[state]) {
+            locationData[state].forEach(dist => {
+                const opt = document.createElement('option');
+                opt.value = dist;
+                opt.innerText = dist;
+                if (dist === currentDistrict) opt.selected = true;
+                districtSelect.appendChild(opt);
+            });
+        }
+    }
+
+    stateSelect.addEventListener('change', updateDistricts);
+    if (stateSelect.value) updateDistricts();
+</script>
+
+<div class="grid animate" style="margin-top: 5rem;">
+    {% for crop in crops %}
+    <div class="card">
+        <div class="crop-img-wrapper">
+            {% if crop.image_url %}
+            <img src="{{ url_for('static', filename=crop.image_url) }}" alt="{{ crop.name }}" class="crop-img">
+            {% else %}
+            <div
+                style="width: 100%; height: 100%; background: #f4f6f5; display: flex; align-items: center; justify-content: center; color: #ccd5d0;">
+                <i class="fas fa-seedling fa-3x"></i>
+            </div>
+            {% endif %}
+            <div style="position: absolute; top: 15px; left: 15px;">
+                <span class="category-pill"
+                    style="background: rgba(255,255,255,0.9); backdrop-filter: blur(5px); color: var(--primary);">
+                    {{ crop.category or 'Pure' }}
+                </span>
+            </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+            <h3 style="color: var(--primary); font-size: 1.4rem; font-weight: 800; margin: 0;">{{ crop.name }}</h3>
+            <div class="price-tag">₹{{ crop.price }}</div>
+        </div>
+
+        <div style="display: flex; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap;">
+            {% if crop.quality %}
+            <span
+                style="font-size: 0.75rem; font-weight: 700; color: #b8860b; background: #fffcf0; padding: 4px 10px; border-radius: 8px;">
+                <i class="fas fa-award"></i> {{ crop.quality }}
+            </span>
+            {% endif %}
+            <span
+                style="font-size: 0.75rem; font-weight: 700; color: var(--primary-light); background: #f0fdf4; padding: 4px 10px; border-radius: 8px;">
+                <i class="fas fa-boxes"></i> {{ crop.quantity }} kg left
+            </span>
+        </div>
+
+        <p
+            style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 6px;">
+            <i class="fas fa-map-marker-alt" style="color: var(--primary-accent);"></i>
+            {{ crop.village }}, {{ crop.district }}
+        </p>
+
+        <div
+            style="padding-top: 1.5rem; border-top: 1px solid #f0f3f1; display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+            <a href="{{ url_for('farmer_profile', id=crop.farmer_id) }}"
+                style="text-decoration: none; display: flex; align-items: center; gap: 10px;">
+                <div
+                    style="width: 32px; height: 32px; background: var(--primary-soft); color: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.8rem;">
+                    {{ crop.farmer_name[0] }}
+                </div>
+                <span style="font-weight: 700; font-size: 0.9rem; color: var(--text-main);">
+                    {{ crop.farmer_name }}
+                    {% if crop.is_verified %}<i class="fas fa-check-circle"
+                        style="color: #34d399; font-size: 0.8rem;"></i>{% endif %}
+                </span>
+            </a>
+        </div>
+
+        <form action="{{ url_for('place_order') }}" method="POST">
+            <input type="hidden" name="crop_id" value="{{ crop.id }}">
+            <div style="display: flex; gap: 10px;">
+                <input type="number" name="quantity" min="0.1" step="0.1" value="1"
+                    style="margin: 0; flex: 1; padding: 0.7rem; border-radius: 10px;">
+                <button type="submit" class="btn btn-primary" style="flex: 2; padding: 0.7rem;">Buy Now</button>
+            </div>
+        </form>
+    </div>
+    {% else %}
+    <div style="grid-column: 1/-1; text-align: center; padding: 80px; background: white; border-radius: 20px;">
+        <i class="fas fa-search fa-3x" style="color: #eee; margin-bottom: 20px;"></i>
+        <h3 style="color: #99aab5;">No crops found</h3>
+        <p style="color: #99aab5;">Try adjusting your filters or check back later.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

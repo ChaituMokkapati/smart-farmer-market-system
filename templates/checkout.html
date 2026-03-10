@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; padding: 4rem 0; align-items: start;"
+    class="animate">
+    <!-- Left Side: Order Details -->
+    <div>
+        <div style="margin-bottom: 2rem;">
+            <span
+                style="color: var(--primary-accent); font-weight: 800; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 2px;">Secure
+                Transaction</span>
+            <h1
+                style="margin: 0.5rem 0 0; font-weight: 900; font-size: 3rem; letter-spacing: -1.5px; color: var(--primary);">
+                Checkout</h1>
+        </div>
+
+        <div class="card" style="padding: 2.5rem; border-radius: var(--radius-lg);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h3 style="margin: 0; font-weight: 800; font-size: 1.5rem;">{{ order.crop_name }}</h3>
+                <span class="badge badge-pending">FINALIZING</span>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+                <div style="display: flex; justify-content: space-between; color: var(--text-muted); font-weight: 600;">
+                    <span>Market Price</span>
+                    <span>₹{{ "%.2f"|format(order.total_price / order.quantity) }} / kg</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; color: var(--text-muted); font-weight: 600;">
+                    <span>Volume</span>
+                    <span>{{ order.quantity }} kg</span>
+                </div>
+                <div
+                    style="display: flex; justify-content: space-between; padding-top: 1.5rem; border-top: 1px solid #f0f3f1; font-weight: 900; font-size: 1.75rem; color: var(--primary);">
+                    <span>Total Amount</span>
+                    <span>₹{{ "%.2f"|format(order.total_price) }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div
+            style="margin-top: 2rem; display: flex; align-items: center; gap: 12px; color: var(--text-muted); font-size: 0.85rem; font-weight: 600; background: rgba(78, 159, 61, 0.05); padding: 1rem; border-radius: 12px; border: 1px solid rgba(78, 159, 61, 0.1);">
+            <i class="fas fa-shield-check" style="color: var(--primary); font-size: 1.25rem;"></i>
+            <span>Your transaction is protected by 256-bit institutional-grade encryption.</span>
+        </div>
+    </div>
+
+    <!-- Right Side: Stripe-like Payment Card -->
+    <div>
+        <div class="card" style="padding: 3rem; border-radius: 24px; box-shadow: var(--shadow-hover);">
+            <h2 style="font-weight: 900; margin-bottom: 2.5rem; font-size: 1.5rem; letter-spacing: -0.5px;">Merchant
+                Payment</h2>
+
+            <form action="{{ url_for('confirm_payment') }}" method="POST">
+                <input type="hidden" name="order_id" value="{{ order.id }}">
+
+                <div class="form-group">
+                    <label>Digital Receipt Email</label>
+                    <input type="email" value="{{ session.get('username') }}@smartfarmer.com" readonly
+                        style="background: var(--bg-main); cursor: not-allowed; font-weight: 600;">
+                </div>
+
+                <div class="form-group">
+                    <label>Card Identity</label>
+                    <div style="position: relative;">
+                        <input type="text" placeholder="●●●● ●●●● ●●●● ●●●●"
+                            style="padding-right: 60px; font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; letter-spacing: 2px;">
+                        <div style="position: absolute; right: 15px; top: 12px; display: flex; gap: 5px;">
+                            <i class="fab fa-cc-visa" style="font-size: 1.5rem; color: #1a1f71;"></i>
+                            <i class="fab fa-cc-mastercard" style="font-size: 1.5rem; color: #eb001b;"></i>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                        <input type="text" placeholder="MM / YY" style="text-align: center;">
+                        <input type="text" placeholder="CVC" style="text-align: center;">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Legal Name on Card</label>
+                    <input type="text" placeholder="Johnathan Doe" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary"
+                    style="width: 100%; padding: 1.25rem; font-size: 1.1rem; font-weight: 800; margin-top: 1rem; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <i class="fas fa-lock"></i> Authorize Payment ₹{{ "%.2f"|format(order.total_price) }}
+                </button>
+            </form>
+
+            <div
+                style="text-align: center; margin-top: 2rem; opacity: 0.6; display: flex; align-items: center; justify-content: center; gap: 1rem;">
+                <i class="fab fa-stripe fa-3x"></i>
+                <div style="height: 20px; width: 1px; background: #ddd;"></div>
+                <div style="font-size: 0.75rem; font-weight: 600; text-align: left; line-height: 1.2;">
+                    Certified Secure<br>Payment Gateway
+                </div>
+            </div>
+        </div>
+
+        <a href="{{ url_for('my_orders') }}"
+            style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 2rem; color: var(--text-muted); font-weight: 700; text-decoration: none; font-size: 0.9rem; transition: color 0.3s;"
+            onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-muted)'">
+            <i class="fas fa-arrow-left"></i> Modifying your order? Return to Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}

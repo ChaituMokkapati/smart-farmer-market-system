@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="animate">
+    <div style="margin-bottom: 3rem;">
+        <h1 style="color: var(--primary);">Admin Command Center</h1>
+        <p style="color: var(--text-muted); font-weight: 500;">Monitor system health, manage users, and oversee
+            marketplace volumes.</p>
+    </div>
+
+    <!-- Analytics Overview -->
+    <div
+        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 4rem;">
+        <div class="card"
+            style="border-top: 4px solid var(--primary); display: flex; align-items: center; gap: 1.5rem;">
+            <div
+                style="width: 50px; height: 50px; border-radius: 12px; background: rgba(78, 159, 61, 0.1); display: flex; align-items: center; justify-content: center; color: var(--primary);">
+                <i class="fas fa-users fa-lg"></i>
+            </div>
+            <div>
+                <p
+                    style="color: var(--text-muted); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; margin-bottom: 0.25rem;">
+                    Total Farmers</p>
+                <h3 style="font-size: 1.75rem; color: var(--primary); margin: 0;">{{ total_farmers }}</h3>
+            </div>
+        </div>
+        <div class="card"
+            style="border-top: 4px solid var(--primary-accent); display: flex; align-items: center; gap: 1.5rem;">
+            <div
+                style="width: 50px; height: 50px; border-radius: 12px; background: rgba(30, 81, 40, 0.1); display: flex; align-items: center; justify-content: center; color: var(--primary-accent);">
+                <i class="fas fa-seedling fa-lg"></i>
+            </div>
+            <div>
+                <p
+                    style="color: var(--text-muted); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; margin-bottom: 0.25rem;">
+                    Live Listings</p>
+                <h3 style="font-size: 1.75rem; color: var(--primary-accent); margin: 0;">{{ total_crops }}</h3>
+            </div>
+        </div>
+        <div class="card" style="border-top: 4px solid #3b82f6; display: flex; align-items: center; gap: 1.5rem;">
+            <div
+                style="width: 50px; height: 50px; border-radius: 12px; background: rgba(59, 130, 246, 0.1); display: flex; align-items: center; justify-content: center; color: #3b82f6;">
+                <i class="fas fa-shopping-cart fa-lg"></i>
+            </div>
+            <div>
+                <p
+                    style="color: var(--text-muted); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; margin-bottom: 0.25rem;">
+                    Orders Processed</p>
+                <h3 style="font-size: 1.75rem; color: #3b82f6; margin: 0;">{{ total_orders }}</h3>
+            </div>
+        </div>
+        <div class="card" style="border-top: 4px solid #f59e0b; display: flex; align-items: center; gap: 1.5rem;">
+            <div
+                style="width: 50px; height: 50px; border-radius: 12px; background: rgba(245, 158, 11, 0.1); display: flex; align-items: center; justify-content: center; color: #f59e0b;">
+                <i class="fas fa-indian-rupee-sign fa-lg"></i>
+            </div>
+            <div>
+                <p
+                    style="color: var(--text-muted); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; margin-bottom: 0.25rem;">
+                    Gross Revenue</p>
+                <h3 style="font-size: 1.75rem; color: #f59e0b; margin: 0;">₹{{ "%.2f"|format(total_revenue) }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr; gap: 4rem;">
+        <!-- Crop Inventory Management -->
+        <section>
+            <h2 style="font-size: 1.5rem; margin-bottom: 1.5rem;">Global Harvest Registry</h2>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Crop Item</th>
+                            <th>Farmer Origin</th>
+                            <th>Warehouse Stack</th>
+                            <th>Market Value</th>
+                            <th>Category Badge</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for crop in crops %}
+                        <tr>
+                            <td style="font-weight: 700;">{{ crop.name }}</td>
+                            <td>
+                                <div style="font-size: 0.9rem; font-weight: 600;">{{ crop.farmer_name }}</div>
+                            </td>
+                            <td>{{ crop.quantity }} kg</td>
+                            <td style="font-weight: 700; color: var(--primary);">₹{{ crop.price }}/unit</td>
+                            <td>
+                                <span class="badge badge-paid"
+                                    style="background: rgba(78, 159, 61, 0.05); color: var(--primary); border: 1px solid rgba(78, 159, 61, 0.2);">
+                                    {{ crop.category or 'General' }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- System-wide Order Flow -->
+        <section>
+            <h2 style="font-size: 1.5rem; margin-bottom: 1.5rem;">Marketplace Order Stream</h2>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Transaction ID</th>
+                            <th>Stakeholders</th>
+                            <th>Commitment</th>
+                            <th>Flow Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr>
+                            <td style="font-family: monospace; font-weight: 600;">#ORD-{{ order.id }}</td>
+                            <td>
+                                <div style="font-weight: 700;">{{ order.customer_name }}</div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted);">Buying {{ order.crop_name }}
+                                </div>
+                            </td>
+                            <td>
+                                <div style="font-weight: 700; color: var(--primary);">₹{{
+                                    "%.2f"|format(order.total_price) }}</div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted);">{{ order.quantity }} units
+                                </div>
+                            </td>
+                            <td>
+                                <form action="{{ url_for('admin_update_order', id=order.id) }}" method="POST">
+                                    <select name="status" onchange="this.form.submit()"
+                                        style="padding: 0.5rem; font-size: 0.8rem; min-width: 140px; border-radius: 10px;">
+                                        <option value="pending" {% if order.status=='pending' %}selected{% endif %}>
+                                            Pending Approval</option>
+                                        <option value="Paid" {% if order.status=='Paid' %}selected{% endif %}>
+                                            Transaction Secured</option>
+                                        <option value="Shipped" {% if order.status=='Shipped' %}selected{% endif %}>In
+                                            Transit</option>
+                                        <option value="Completed" {% if order.status=='Completed' %}selected{% endif %}>
+                                            Execution Finished</option>
+                                        <option value="Cancelled" {% if order.status=='Cancelled' %}selected{% endif %}>
+                                            Revoked</option>
+                                    </select>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- User Directory -->
+        <section>
+            <h2 style="font-size: 1.5rem; margin-bottom: 1.5rem;">User & Partner Directory</h2>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Identity</th>
+                            <th>Structural Role</th>
+                            <th>Contact Gateway</th>
+                            <th>Operational State</th>
+                            <th>Access Control</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>
+                                <div style="font-weight: 800;">{{ user.full_name }}</div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted);">@{{ user.username }}</div>
+                            </td>
+                            <td>
+                                <span
+                                    style="text-transform: uppercase; font-size: 0.7rem; font-weight: 800; color: {{ 'var(--primary-accent)' if user.role == 'farmer' else '#3b82f6' }};">
+                                    {{ user.role }}
+                                </span>
+                            </td>
+                            <td>{{ user.contact }}</td>
+                            <td>
+                                {% if user.role == 'farmer' %}
+                                {% if user.is_verified %}
+                                <a href="{{ url_for('toggle_verification', user_id=user.id) }}" class="badge badge-paid"
+                                    style="text-decoration: none; border-radius: 8px;">
+                                    <i class="fas fa-shield-check"></i> VERIFIED
+                                </a>
+                                {% else %}
+                                <a href="{{ url_for('toggle_verification', user_id=user.id) }}"
+                                    class="badge badge-pending" style="text-decoration: none; border-radius: 8px;">
+                                    <i class="fas fa-shield-exclamation"></i> UNVETTED
+                                </a>
+                                {% endif %}
+                                {% else %}
+                                <span style="font-size: 0.8rem; color: #ccd5d0;">Standard</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if user.role != 'admin' %}
+                                <a href="{{ url_for('delete_user', id=user.id) }}"
+                                    style="color: #ef4444; font-size: 0.8rem; font-weight: 700; text-decoration: none;"
+                                    onclick="return confirm('Permanently remove this user?')">
+                                    <i class="fas fa-user-minus"></i> TERMINATE
+                                </a>
+                                {% else %}
+                                <span style="color: #ccd5d0;"><i class="fas fa-lock"></i> SYSTEM</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}
