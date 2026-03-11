@@ -314,7 +314,7 @@ a {
     margin-top: 0.32rem;
     font-family: "Fraunces", serif;
     font-size: 1.7rem;
-    font-weight: 700;
+    font-weight: 600;
     line-height: 1;
     color: var(--soil);
 }
@@ -682,7 +682,7 @@ a {
 .admin-status-value {
     margin-top: 0.5rem;
     font-family: "Fraunces", serif;
-    font-weight: 700;
+    font-weight: 600;
     line-height: 1;
 }
 

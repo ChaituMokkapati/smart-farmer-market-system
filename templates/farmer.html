@@ -8,7 +8,8 @@
                 <i class="fa-solid fa-tractor"></i>
                 Farmer workspace
             </span>
-            <h1 class="mt-4 font-display text-3xl font-bold text-soil sm:text-[2.7rem]">Run your harvest operation</h1>
+            <h1 class="mt-4 font-display text-3xl font-semibold text-soil sm:text-[2.7rem]">Run your harvest operation
+            </h1>
             <p class="mt-3 max-w-2xl text-sm leading-6 text-ink/70">Manage fresh listings, watch incoming orders,
                 and keep your storefront updated with a single operational dashboard.</p>
         </div>
@@ -56,14 +57,15 @@
                 <i class="fa-solid fa-plus"></i>
                 New listing
             </span>
-            <h2 class="mt-3 font-display text-[1.9rem] font-bold text-soil">List fresh harvest</h2>
+            <h2 class="mt-3 font-display text-[1.9rem] font-semibold text-soil">List fresh harvest</h2>
             <p class="mt-2 text-sm leading-6 text-ink/68">Publish crop details, stock, location, and proof to improve
                 buyer confidence.</p>
 
             <form action="{{ url_for('add_crop') }}" method="POST" enctype="multipart/form-data" class="mt-6 space-y-4">
                 <div>
                     <label class="field-label" for="name">Product name</label>
-                    <input id="name" class="input-shell" type="text" name="name" placeholder="Sona Masuri Rice" required>
+                    <input id="name" class="input-shell" type="text" name="name" placeholder="Sona Masuri Rice"
+                        required>
                 </div>
 
                 <div class="grid gap-4 sm:grid-cols-2">
@@ -112,18 +114,21 @@
                     </div>
                     <div>
                         <label class="field-label" for="district">District</label>
-                        <input id="district" class="input-shell" type="text" name="district" placeholder="Guntur" required>
+                        <input id="district" class="input-shell" type="text" name="district" placeholder="Guntur"
+                            required>
                     </div>
                 </div>
 
                 <div class="grid gap-4 sm:grid-cols-2">
                     <div>
                         <label class="field-label" for="village">Village</label>
-                        <input id="village" class="input-shell" type="text" name="village" placeholder="Amaravati" required>
+                        <input id="village" class="input-shell" type="text" name="village" placeholder="Amaravati"
+                            required>
                     </div>
                     <div>
                         <label class="field-label" for="pincode">Pincode</label>
-                        <input id="pincode" class="input-shell" type="text" name="pincode" placeholder="522001" required>
+                        <input id="pincode" class="input-shell" type="text" name="pincode" placeholder="522001"
+                            required>
                     </div>
                 </div>
 
@@ -143,7 +148,8 @@
                     <label class="field-label" for="product_price">Price per unit</label>
                     <input id="product_price" class="input-shell" type="number" step="0.01" name="price"
                         placeholder="50.00" required>
-                    <div id="price_suggestion" class="mt-2.5 rounded-[1rem] border border-leaf/10 bg-mist/70 px-4 py-3 text-sm font-semibold text-soil">
+                    <div id="price_suggestion"
+                        class="mt-2.5 rounded-[1rem] border border-leaf/10 bg-mist/70 px-4 py-3 text-sm font-semibold text-soil">
                         Select a category for price advice.
                     </div>
                 </div>
@@ -182,7 +188,7 @@
                         <i class="fa-solid fa-boxes-stacked"></i>
                         Inventory
                     </span>
-                    <h2 class="mt-3 font-display text-[1.9rem] font-bold text-soil">Active listings</h2>
+                    <h2 class="mt-3 font-display text-[1.9rem] font-semibold text-soil">Active listings</h2>
                 </div>
             </div>
 
@@ -201,22 +207,24 @@
                         {% for crop in crops %}
                         <tr>
                             <td data-label="Crop">
-                                <div class="font-bold text-soil">{{ crop.name }}</div>
+                                <div class="font-semibold text-soil">{{ crop.name }}</div>
                                 <div class="mt-1 text-sm text-ink/55">{{ crop.category or 'General' }}</div>
                             </td>
                             <td data-label="Stock">
-                                <div class="font-bold text-soil">{{ crop.quantity }} kg</div>
+                                <div class="font-semibold text-soil">{{ crop.quantity }} kg</div>
                             </td>
                             <td data-label="Price">
-                                <div class="font-bold text-soil">&#8377;{{ crop.price }}</div>
+                                <div class="font-semibold text-soil">&#8377;{{ crop.price }}</div>
                             </td>
                             <td data-label="Actions">
                                 <div class="flex flex-wrap gap-2">
-                                    <a href="{{ url_for('edit_crop', id=crop.id) }}" class="btn-outline-app px-4 py-3 text-sm">
+                                    <a href="{{ url_for('edit_crop', id=crop.id) }}"
+                                        class="btn-outline-app px-4 py-3 text-sm">
                                         <i class="fa-solid fa-pen"></i>
                                         Edit
                                     </a>
-                                    <a href="{{ url_for('delete_crop', id=crop.id) }}" class="btn-danger-app px-4 py-3 text-sm"
+                                    <a href="{{ url_for('delete_crop', id=crop.id) }}"
+                                        class="btn-danger-app px-4 py-3 text-sm"
                                         onclick="return confirm('Archive this listing?')">
                                         <i class="fa-solid fa-trash"></i>
                                         Delete
@@ -230,7 +238,7 @@
             </div>
             {% else %}
             <div class="empty-state mt-6">
-                <h3 class="font-display text-[2rem] font-bold text-soil">No active listings yet</h3>
+                <h3 class="font-display text-[2rem] font-semibold text-soil">No active listings yet</h3>
                 <p class="mx-auto mt-3 max-w-xl text-sm leading-6 text-ink/65 sm:text-base">Publish your first crop to
                     start appearing in the customer marketplace.</p>
             </div>
@@ -243,7 +251,7 @@
                     <i class="fa-solid fa-cart-flatbed"></i>
                     Orders
                 </span>
-                <h2 class="mt-3 font-display text-[1.9rem] font-bold text-soil">Incoming orders</h2>
+                <h2 class="mt-3 font-display text-[1.9rem] font-semibold text-soil">Incoming orders</h2>
             </div>
 
             {% if orders %}
@@ -253,8 +261,10 @@
                     <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                         <div>
                             <div class="flex flex-wrap items-center gap-3">
-                                <h3 class="font-display text-[1.5rem] font-bold text-soil">{{ order.crop_name }}</h3>
-                                <span class="badge-app {% if order.status in ['Delivered'] %}badge-success{% elif order.status in ['Cancelled'] %}badge-danger{% elif order.status in ['Shipped', 'Out for Delivery'] %}badge-info{% else %}badge-warning{% endif %}">
+                                <h3 class="font-display text-[1.5rem] font-semibold text-soil">{{ order.crop_name }}
+                                </h3>
+                                <span
+                                    class="badge-app {% if order.status in ['Delivered'] %}badge-success{% elif order.status in ['Cancelled'] %}badge-danger{% elif order.status in ['Shipped', 'Out for Delivery'] %}badge-info{% else %}badge-warning{% endif %}">
                                     {{ order.status }}
                                 </span>
                             </div>
@@ -268,11 +278,13 @@
                             <div class="mt-4 grid gap-3 sm:grid-cols-2">
                                 <div class="rounded-[1rem] bg-white/70 p-3.5">
                                     <p class="metric-label">Volume</p>
-                                    <p class="mt-2 font-display text-[1.45rem] font-bold text-soil">{{ order.quantity }} kg</p>
+                                    <p class="mt-2 font-display text-[1.45rem] font-semibold text-soil">{{
+                                        order.quantity }} kg</p>
                                 </div>
                                 <div class="rounded-[1rem] bg-white/70 p-3.5">
                                     <p class="metric-label">Value</p>
-                                    <p class="mt-2 font-display text-[1.45rem] font-bold text-soil">&#8377;{{ "%.2f"|format(order.total_price) }}</p>
+                                    <p class="mt-2 font-display text-[1.45rem] font-semibold text-soil">&#8377;{{
+                                        "%.2f"|format(order.total_price) }}</p>
                                 </div>
                             </div>
                         </div>
@@ -283,7 +295,8 @@
                                 <input type="hidden" name="order_id" value="{{ order.id }}">
                                 <div>
                                     <label class="field-label" for="status-{{ order.id }}">Update status</label>
-                                    <select id="status-{{ order.id }}" class="select-shell status-select" name="status" required>
+                                    <select id="status-{{ order.id }}" class="select-shell status-select" name="status"
+                                        required>
                                         <option value="Order Confirmed">Order Confirmed</option>
                                         <option value="Packed">Packed</option>
                                         <option value="Shipped">Shipped</option>
@@ -313,7 +326,7 @@
             </div>
             {% else %}
             <div class="empty-state mt-6">
-                <h3 class="font-display text-[2rem] font-bold text-soil">No incoming orders yet</h3>
+                <h3 class="font-display text-[2rem] font-semibold text-soil">No incoming orders yet</h3>
                 <p class="mx-auto mt-3 max-w-xl text-sm leading-6 text-ink/65 sm:text-base">Customer orders will appear
                     here as soon as your listings begin converting.</p>
             </div>

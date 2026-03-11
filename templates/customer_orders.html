@@ -8,7 +8,8 @@
                 <i class="fa-solid fa-truck-fast"></i>
                 Customer dashboard
             </span>
-            <h1 class="mt-4 font-display text-3xl font-bold text-soil sm:text-[2.7rem]">Track your purchase journey</h1>
+            <h1 class="mt-4 font-display text-3xl font-semibold text-soil sm:text-[2.7rem]">Track your purchase journey
+            </h1>
             <p class="mt-3 max-w-2xl text-sm leading-6 text-ink/70">Stay on top of active deliveries, payment
                 progress, and completed orders with one clean timeline-driven workspace.</p>
         </div>
@@ -31,7 +32,7 @@
             <i class="fa-solid fa-route"></i>
             Active deliveries
         </span>
-        <h2 class="mt-3 font-display text-[1.9rem] font-bold text-soil">Orders in progress</h2>
+        <h2 class="mt-3 font-display text-[1.9rem] font-semibold text-soil">Orders in progress</h2>
     </div>
 
     <div class="mt-6 grid gap-5 xl:grid-cols-2">
@@ -60,13 +61,14 @@
                 <div class="min-w-0 flex-1">
                     <div class="flex flex-wrap items-start justify-between gap-3">
                         <div>
-                            <h3 class="font-display text-[1.9rem] font-bold text-soil">{{ order.crop_name }}</h3>
+                            <h3 class="font-display text-[1.9rem] font-semibold text-soil">{{ order.crop_name }}</h3>
                             <p class="mt-1 text-sm font-semibold text-ink/65">
                                 <i class="fa-solid fa-store text-leaf"></i>
                                 {{ order.farmer_name }}
                             </p>
                         </div>
-                        <span class="badge-app {% if order.status in ['pending', 'Paid'] %}badge-warning{% elif order.status in ['Shipped', 'Out for Delivery'] %}badge-info{% else %}badge-success{% endif %}">
+                        <span
+                            class="badge-app {% if order.status in ['pending', 'Paid'] %}badge-warning{% elif order.status in ['Shipped', 'Out for Delivery'] %}badge-info{% else %}badge-success{% endif %}">
                             {{ order.status }}
                         </span>
                     </div>
@@ -74,15 +76,17 @@
                     <div class="mt-4 grid gap-3 sm:grid-cols-3">
                         <div class="rounded-2xl bg-mist/70 p-4">
                             <p class="metric-label">Amount</p>
-                            <p class="mt-2 font-display text-2xl font-bold text-soil">&#8377;{{ "%.2f"|format(order.total_price) }}</p>
+                            <p class="mt-2 font-display text-2xl font-semibold text-soil">&#8377;{{
+                                "%.2f"|format(order.total_price) }}</p>
                         </div>
                         <div class="rounded-2xl bg-mist/70 p-4">
                             <p class="metric-label">Volume</p>
-                            <p class="mt-2 font-display text-2xl font-bold text-soil">{{ order.quantity }} kg</p>
+                            <p class="mt-2 font-display text-2xl font-semibold text-soil">{{ order.quantity }} kg</p>
                         </div>
                         <div class="rounded-2xl bg-mist/70 p-4">
                             <p class="metric-label">ETA</p>
-                            <p class="mt-2 font-body text-lg font-extrabold text-soil">{{ order.estimated_delivery }}</p>
+                            <p class="mt-2 font-body text-lg font-extrabold text-soil">{{ order.estimated_delivery }}
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -91,12 +95,14 @@
             <div class="mt-5 rounded-[1.2rem] border border-soil/10 bg-white/65 p-4">
                 <div class="mb-4 flex items-center justify-between gap-3">
                     <div>
-                        <p class="text-sm font-bold text-soil">Delivery timeline</p>
-                        <p class="text-sm text-ink/62">Current location: {{ order.current_location or 'Awaiting movement' }}</p>
+                        <p class="text-sm font-semibold text-soil">Delivery timeline</p>
+                        <p class="text-sm text-ink/62">Current location: {{ order.current_location or 'Awaiting
+                            movement' }}</p>
                     </div>
                     <span class="badge-app badge-neutral">Order #{{ order.id }}</span>
                 </div>
-                {% set stages = ['Order Placed', 'Order Confirmed', 'Packed', 'Shipped', 'Out for Delivery', 'Delivered'] %}
+                {% set stages = ['Order Placed', 'Order Confirmed', 'Packed', 'Shipped', 'Out for Delivery',
+                'Delivered'] %}
                 <div>
                     {% for stage in stages %}
                     <div class="timeline-step {% if loop.index0 <= ns.stage_index %}active{% endif %}">
@@ -105,7 +111,8 @@
                         </span>
                         <div class="min-w-0 flex-1">
                             <div class="flex flex-wrap items-center justify-between gap-2">
-                                <p class="font-bold {% if loop.index0 <= ns.stage_index %}text-soil{% else %}text-ink/45{% endif %}">
+                                <p
+                                    class="font-semibold {% if loop.index0 <= ns.stage_index %}text-soil{% else %}text-ink/45{% endif %}">
                                     {{ stage }}
                                 </p>
                                 {% for update in order.tracking %}
@@ -149,7 +156,7 @@
             <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-mist text-2xl text-leaf/55">
                 <i class="fa-solid fa-basket-shopping"></i>
             </div>
-            <h3 class="mt-5 font-display text-[2rem] font-bold text-soil">No active orders right now</h3>
+            <h3 class="mt-5 font-display text-[2rem] font-semibold text-soil">No active orders right now</h3>
             <p class="mx-auto mt-3 max-w-xl text-sm leading-6 text-ink/65 sm:text-base">Once you place an order, its
                 live progress and fulfillment details will appear here.</p>
             <a href="{{ url_for('marketplace') }}" class="btn-primary-app mt-6">
@@ -167,7 +174,7 @@
             <i class="fa-solid fa-clock-rotate-left"></i>
             Archive
         </span>
-        <h2 class="mt-3 font-display text-[1.9rem] font-bold text-soil">Completed and cancelled orders</h2>
+        <h2 class="mt-3 font-display text-[1.9rem] font-semibold text-soil">Completed and cancelled orders</h2>
     </div>
 
     <div class="mt-6 grid gap-5 lg:grid-cols-2 xl:grid-cols-3">
@@ -176,14 +183,16 @@
             <div class="flex items-start justify-between gap-3">
                 <div class="flex items-center gap-3">
                     <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-mist text-xl text-leaf/55">
-                        <i class="fa-solid {% if order.status == 'Delivered' %}fa-circle-check{% else %}fa-ban{% endif %}"></i>
+                        <i
+                            class="fa-solid {% if order.status == 'Delivered' %}fa-circle-check{% else %}fa-ban{% endif %}"></i>
                     </div>
                     <div>
-                        <h3 class="font-bold text-soil">{{ order.crop_name }}</h3>
+                        <h3 class="font-semibold text-soil">{{ order.crop_name }}</h3>
                         <p class="text-sm text-ink/55">{{ order.order_date[:10] }}</p>
                     </div>
                 </div>
-                <span class="badge-app {% if order.status == 'Delivered' %}badge-success{% else %}badge-danger{% endif %}">
+                <span
+                    class="badge-app {% if order.status == 'Delivered' %}badge-success{% else %}badge-danger{% endif %}">
                     {{ order.status }}
                 </span>
             </div>
@@ -191,30 +200,33 @@
             <div class="mt-5 grid gap-3 sm:grid-cols-2">
                 <div class="rounded-2xl bg-mist/70 p-4">
                     <p class="metric-label">Quantity</p>
-                    <p class="mt-2 font-display text-2xl font-bold text-soil">{{ order.quantity }} kg</p>
+                    <p class="mt-2 font-display text-2xl font-semibold text-soil">{{ order.quantity }} kg</p>
                 </div>
                 <div class="rounded-2xl bg-mist/70 p-4">
                     <p class="metric-label">Amount</p>
-                    <p class="mt-2 font-display text-2xl font-bold text-soil">&#8377;{{ "%.2f"|format(order.total_price) }}</p>
+                    <p class="mt-2 font-display text-2xl font-semibold text-soil">&#8377;{{
+                        "%.2f"|format(order.total_price) }}</p>
                 </div>
             </div>
 
             {% if order.status == 'Delivered' %}
             <div class="mt-5 rounded-[1.5rem] border border-soil/10 bg-white/70 p-4">
-                <p class="text-sm font-bold text-soil">Review this farmer</p>
+                <p class="text-sm font-semibold text-soil">Review this farmer</p>
                 <p class="mt-1 text-sm text-ink/62">Share feedback to strengthen trust in the network.</p>
                 <form action="{{ url_for('submit_review') }}" method="POST" class="mt-4 space-y-4">
                     <input type="hidden" name="order_id" value="{{ order.id }}">
                     <input type="hidden" name="farmer_id" value="{{ order.farmer_id }}">
                     <div class="relative flex flex-row-reverse justify-end gap-1">
                         {% for i in range(5, 0, -1) %}
-                        <input class="star-input" type="radio" name="rating" value="{{ i }}" id="rate-{{ order.id }}-{{ i }}" required>
+                        <input class="star-input" type="radio" name="rating" value="{{ i }}"
+                            id="rate-{{ order.id }}-{{ i }}" required>
                         <label class="star-label text-xl" for="rate-{{ order.id }}-{{ i }}">
                             <i class="fa-solid fa-star"></i>
                         </label>
                         {% endfor %}
                     </div>
-                    <textarea name="comment" class="textarea-shell" placeholder="How was the product quality and delivery experience?"></textarea>
+                    <textarea name="comment" class="textarea-shell"
+                        placeholder="How was the product quality and delivery experience?"></textarea>
                     <button type="submit" class="btn-primary-app w-full justify-center">
                         Submit review
                         <i class="fa-solid fa-paper-plane"></i>
@@ -225,7 +237,7 @@
         </article>
         {% else %}
         <div class="empty-state lg:col-span-2 xl:col-span-3">
-            <h3 class="font-display text-[2rem] font-bold text-soil">Your order archive is still empty</h3>
+            <h3 class="font-display text-[2rem] font-semibold text-soil">Your order archive is still empty</h3>
             <p class="mx-auto mt-3 max-w-xl text-sm leading-6 text-ink/65 sm:text-base">Completed or cancelled orders
                 will move here automatically for future reference.</p>
         </div>

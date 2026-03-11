@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Farmer Market</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='vendor/fonts/fonts.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Rashi+Hebrew:wght@100..900&display=swap" rel="stylesheet">
     <script src="{{ url_for('static', filename='vendor/tailwind/tailwindcss.js') }}"></script>
     <script>
         tailwind.config = {
@@ -21,7 +24,7 @@
                         clay: "#8a5c3d"
                     },
                     fontFamily: {
-                        display: ["Fraunces", "serif"],
+                        display: ["Noto Rashi Hebrew", "serif"],
                         body: ["Plus Jakarta Sans", "sans-serif"]
                     },
                     boxShadow: {
@@ -52,7 +55,8 @@
                     <i class="fa-solid fa-seedling"></i>
                 </span>
                 <span>
-                    <span class="block font-display text-[1.15rem] font-bold tracking-tight text-soil">Smart Farmer</span>
+                    <span class="block font-display text-[1.15rem] font-semibold tracking-tight text-soil">Smart
+                        Farmer</span>
                     <span class="block text-[0.65rem] font-bold uppercase tracking-[0.32em] text-leaf/70">Soil to
                         table network</span>
                 </span>
@@ -63,9 +67,9 @@
                 <i class="fa-solid fa-bars"></i>
             </button>
 
-            <div id="primary-menu"
-                class="mobile-menu hidden lg:flex lg:items-center lg:gap-4">
-                <div class="flex flex-col gap-2 rounded-[1.45rem] border border-soil/10 bg-white/95 p-4 shadow-bloom lg:flex-row lg:items-center lg:rounded-full lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none">
+            <div id="primary-menu" class="mobile-menu hidden lg:flex lg:items-center lg:gap-4">
+                <div
+                    class="flex flex-col gap-2 rounded-[1.45rem] border border-soil/10 bg-white/95 p-4 shadow-bloom lg:flex-row lg:items-center lg:rounded-full lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none">
                     <a href="{{ url_for('index') }}" class="nav-link">Home</a>
                     {% if session.get('user_id') %}
                     {% if session.get('role') == 'farmer' %}
@@ -88,7 +92,8 @@
     </header>
     {% endif %}
 
-    <div class="flash-stack pointer-events-none fixed left-4 right-4 top-24 z-50 flex flex-col gap-3 md:left-auto md:right-6 md:top-28 md:w-[24rem]">
+    <div
+        class="flash-stack pointer-events-none fixed left-4 right-4 top-24 z-50 flex flex-col gap-3 md:left-auto md:right-6 md:top-28 md:w-[24rem]">
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
         {% for category, message in messages %}
@@ -110,7 +115,8 @@
         {% endwith %}
     </div>
 
-    <main class="{% if is_admin_command %}min-h-screen{% else %}mx-auto min-h-[calc(100vh-10rem)] max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8{% endif %}">
+    <main
+        class="{% if is_admin_command %}min-h-screen{% else %}mx-auto min-h-[calc(100vh-10rem)] max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8{% endif %}">
         {% block content %}{% endblock %}
     </main>
 
@@ -119,15 +125,17 @@
         <div
             class="mx-auto grid max-w-7xl gap-6 px-4 py-8 text-sm text-ink/70 sm:px-6 lg:grid-cols-[1.6fr_1fr_1fr] lg:px-8">
             <div class="space-y-3">
-                <p class="font-display text-2xl font-bold text-soil">Smart Farmer</p>
+                <p class="font-display text-2xl font-semibold text-soil">Smart Farmer</p>
                 <p class="max-w-xl">A modern agricultural marketplace built to help farmers sell with trust, speed, and
                     direct market visibility.</p>
             </div>
             <div>
                 <p class="footer-label">Product</p>
                 <div class="footer-links">
-                    <a href="{{ url_for('marketplace') if session.get('user_id') else url_for('login') }}">Marketplace</a>
-                    <a href="{{ url_for('farmer_dashboard') if session.get('role') == 'farmer' else url_for('register') }}">Farmer
+                    <a
+                        href="{{ url_for('marketplace') if session.get('user_id') else url_for('login') }}">Marketplace</a>
+                    <a
+                        href="{{ url_for('farmer_dashboard') if session.get('role') == 'farmer' else url_for('register') }}">Farmer
                         Tools</a>
                 </div>
             </div>
