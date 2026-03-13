@@ -102,6 +102,46 @@ python app.py
 - OTP expiry is controlled with `OTP_EXPIRY_SECONDS`.
 - User OTP rate limiting is controlled with `OTP_MAX_PER_HOUR`.
 
+## Docker and Coolify deployment
+
+This repository now includes a production-ready `Dockerfile` and `docker-entrypoint.sh` for container deployment.
+
+The container startup flow:
+
+1. Creates persistent data directories.
+2. Runs `python database.py` to initialize or migrate the SQLite schema and sync the admin user.
+3. Starts Gunicorn on `0.0.0.0:$PORT`.
+
+### Build locally
+
+```powershell
+docker build -t smart-farmer-market-system .
+```
+
+### Run locally
+
+```powershell
+docker run --rm -p 8000:8000 `
+  -e SECRET_KEY=replace-me `
+  -e SESSION_COOKIE_SECURE=false `
+  -e MAIL_USERNAME=your-gmail-address@gmail.com `
+  -e MAIL_PASSWORD=your-gmail-app-password `
+  -e MAIL_DEFAULT_SENDER=your-gmail-address@gmail.com `
+  -e ADMIN_EMAIL=admin@example.com `
+  -e ADMIN_PASSWORD=replace-me `
+  -v ${PWD}\data:/app/data `
+  -v ${PWD}\static\uploads:/app/static/uploads `
+  smart-farmer-market-system
+```
+
+### Coolify notes
+
+- Deploy from the public Git repository using the `Dockerfile` build pack.
+- Add a persistent volume for `/app/data` so `market.db` survives redeploys.
+- Add a persistent volume for `/app/static/uploads` if uploaded images must persist.
+- Set `DATABASE_PATH=/app/data/market.db`.
+- Set `SESSION_COOKIE_SECURE=true` when the app is exposed behind HTTPS.
+
 ## OTP troubleshooting
 
 - Use a real inbox address. Example or testing domains such as `example.com` are blocked for OTP delivery.
