@@ -1,13 +1,60 @@
 document.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll("[data-mobile-toggle]").forEach((button) => {
-        button.addEventListener("click", () => {
-            const target = document.getElementById(button.dataset.target);
-            if (!target) {
-                return;
-            }
+    const mobileToggles = document.querySelectorAll("[data-mobile-toggle]");
+    const closeMobileMenu = (button, target, backdrop) => {
+        target.classList.add("hidden");
+        button.setAttribute("aria-expanded", "false");
+        if (backdrop) {
+            backdrop.classList.add("hidden");
+        }
+        document.body.classList.remove("mobile-menu-open");
+    };
 
-            target.classList.toggle("hidden");
+    mobileToggles.forEach((button) => {
+        const target = document.getElementById(button.dataset.target);
+        const backdrop = button.dataset.backdrop ? document.getElementById(button.dataset.backdrop) : null;
+        if (!target) {
+            return;
+        }
+
+        button.addEventListener("click", () => {
+            const willOpen = target.classList.contains("hidden");
+            target.classList.toggle("hidden", !willOpen);
+            button.setAttribute("aria-expanded", willOpen ? "true" : "false");
+            if (backdrop) {
+                backdrop.classList.toggle("hidden", !willOpen);
+            }
+            document.body.classList.toggle("mobile-menu-open", willOpen);
         });
+
+        if (backdrop) {
+            backdrop.addEventListener("click", () => closeMobileMenu(button, target, backdrop));
+        }
+
+        target.querySelectorAll("a, button").forEach((item) => {
+            item.addEventListener("click", () => {
+                if (window.innerWidth < 1024 && !target.classList.contains("hidden")) {
+                    closeMobileMenu(button, target, backdrop);
+                }
+            });
+        });
+    });
+
+    window.addEventListener("resize", () => {
+        if (window.innerWidth >= 1024) {
+            mobileToggles.forEach((button) => {
+                const target = document.getElementById(button.dataset.target);
+                const backdrop = button.dataset.backdrop ? document.getElementById(button.dataset.backdrop) : null;
+                if (!target) {
+                    return;
+                }
+                target.classList.remove("hidden");
+                button.setAttribute("aria-expanded", "false");
+                if (backdrop) {
+                    backdrop.classList.add("hidden");
+                }
+            });
+            document.body.classList.remove("mobile-menu-open");
+        }
     });
 
     document.querySelectorAll("[data-dismiss-flash]").forEach((button) => {

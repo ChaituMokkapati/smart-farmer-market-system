@@ -5,37 +5,36 @@
     <div class="hero-shell reveal rounded-[1.8rem] px-5 py-6 sm:px-7 sm:py-8 lg:px-8 lg:py-9">
         <span class="section-kicker">
             <i class="fa-solid fa-wheat-awn"></i>
-            {{ welcome_msg }} to the network
+            {{ welcome_message }}
         </span>
         <h1 class="mt-5 max-w-3xl font-display text-3xl font-bold leading-tight text-soil sm:text-[2.7rem] lg:text-[3.4rem]">
-            Discover trusted local harvests, sourced directly from growers across India.
+            {{ t('marketplace.hero.title', 'Discover trusted local harvests, sourced directly from growers across India.') }}
         </h1>
         <p class="mt-4 max-w-2xl text-sm leading-6 text-ink/72 sm:text-base">
-            Browse region-aware crop listings, compare verified farmer profiles, and order fresh produce through a
-            marketplace designed for transparent farm-to-home commerce.
+            {{ t('marketplace.hero.description', 'Browse region-aware crop listings, compare verified farmer profiles, and order fresh produce through a marketplace designed for transparent farm-to-home commerce.') }}
         </p>
 
         <div class="mt-8 flex flex-wrap gap-3">
-            <span class="badge-app badge-success"><i class="fa-solid fa-badge-check"></i> Verified growers</span>
-            <span class="badge-app badge-info"><i class="fa-solid fa-location-dot"></i> Regional discovery</span>
-            <span class="badge-app badge-warning"><i class="fa-solid fa-truck"></i> Live order tracking</span>
+            <span class="badge-app badge-success"><i class="fa-solid fa-badge-check"></i> {{ t('marketplace.badge.verified', 'Verified growers') }}</span>
+            <span class="badge-app badge-info"><i class="fa-solid fa-location-dot"></i> {{ t('marketplace.badge.regional', 'Regional discovery') }}</span>
+            <span class="badge-app badge-warning"><i class="fa-solid fa-truck"></i> {{ t('marketplace.badge.tracking', 'Live order tracking') }}</span>
         </div>
 
         <div class="mt-8 grid gap-3 sm:grid-cols-3">
             <div class="metric-card">
-                <p class="metric-label">Live listings</p>
+                <p class="metric-label">{{ t('marketplace.metric.live_listings', 'Live listings') }}</p>
                 <p class="metric-value">{{ crops|length }}</p>
-                <p class="mt-2 text-sm text-ink/64">Fresh products visible with direct farmer identity.</p>
+                <p class="mt-2 text-sm text-ink/64">{{ t('marketplace.metric.live_listings.desc', 'Fresh products visible with direct farmer identity.') }}</p>
             </div>
             <div class="metric-card">
-                <p class="metric-label">States active</p>
+                <p class="metric-label">{{ t('marketplace.metric.states_active', 'States active') }}</p>
                 <p class="metric-value">{{ states|length }}</p>
-                <p class="mt-2 text-sm text-ink/64">Search by region to source from nearby or preferred zones.</p>
+                <p class="mt-2 text-sm text-ink/64">{{ t('marketplace.metric.states_active.desc', 'Search by region to source from nearby or preferred zones.') }}</p>
             </div>
             <div class="metric-card">
-                <p class="metric-label">Categories</p>
+                <p class="metric-label">{{ t('marketplace.metric.categories', 'Categories') }}</p>
                 <p class="metric-value">{{ categories|length }}</p>
-                <p class="mt-2 text-sm text-ink/64">Produce, grains, dairy, organics, and more.</p>
+                <p class="mt-2 text-sm text-ink/64">{{ t('marketplace.metric.categories.desc', 'Produce, grains, dairy, organics, and more.') }}</p>
             </div>
         </div>
     </div>
@@ -45,36 +44,35 @@
             <div>
                 <span class="section-kicker">
                     <i class="fa-solid fa-sliders"></i>
-                    Search harvests
+                    {{ t('marketplace.search.kicker', 'Search harvests') }}
                 </span>
-                <h2 class="mt-3 font-display text-[1.9rem] font-bold text-soil">Filter the market</h2>
-                <p class="mt-2 text-sm leading-6 text-ink/68">Match by crop, category, state, and district with one
-                    clean search panel.</p>
+                <h2 class="mt-3 font-display text-[1.9rem] font-bold text-soil">{{ t('marketplace.search.title', 'Filter the market') }}</h2>
+                <p class="mt-2 text-sm leading-6 text-ink/68">{{ t('marketplace.search.description', 'Match by crop, category, state, and district with one clean search panel.') }}</p>
             </div>
-            <div class="hidden rounded-2xl bg-grain/15 px-3 py-2 text-sm font-bold text-soil sm:block">Smart search
+            <div class="hidden rounded-2xl bg-grain/15 px-3 py-2 text-sm font-bold text-soil sm:block">{{ t('marketplace.search.smart', 'Smart search') }}
             </div>
         </div>
 
         <form action="{{ url_for('marketplace') }}" method="GET" class="mt-6 grid gap-4">
             <div>
-                <label class="field-label" for="query">Search products</label>
+                <label class="field-label" for="query">{{ t('marketplace.search.products', 'Search products') }}</label>
                 <input id="query" class="input-shell" type="text" name="query"
                     placeholder="Tomatoes, rice, honey, organic vegetables" value="{{ query or '' }}">
             </div>
             <div class="grid gap-4 sm:grid-cols-2">
                 <div>
-                    <label class="field-label" for="category">Category</label>
+                    <label class="field-label" for="category">{{ t('marketplace.search.category', 'Category') }}</label>
                     <select id="category" class="select-shell" name="category">
-                        <option value="">All categories</option>
+                        <option value="">{{ t('marketplace.search.all_categories', 'All categories') }}</option>
                         {% for cat in categories %}
                         <option value="{{ cat }}" {% if category==cat %}selected{% endif %}>{{ cat }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div>
-                    <label class="field-label" for="state-select">State</label>
+                    <label class="field-label" for="state-select">{{ t('marketplace.search.state', 'State') }}</label>
                     <select id="state-select" class="select-shell" name="state">
-                        <option value="">All states</option>
+                        <option value="">{{ t('marketplace.search.all_states', 'All states') }}</option>
                         {% for s in states %}
                         <option value="{{ s }}" {% if state==s %}selected{% endif %}>{{ s }}</option>
                         {% endfor %}
@@ -82,20 +80,20 @@
                 </div>
             </div>
             <div>
-                <label class="field-label" for="district-select">District</label>
+                <label class="field-label" for="district-select">{{ t('marketplace.search.district', 'District') }}</label>
                 <select id="district-select" class="select-shell" name="district">
-                    <option value="">All districts</option>
+                    <option value="">{{ t('marketplace.search.all_districts', 'All districts') }}</option>
                 </select>
             </div>
             <div class="grid gap-3 sm:grid-cols-[1fr_auto]">
                 <button type="submit" class="btn-primary-app">
                     <i class="fa-solid fa-magnifying-glass"></i>
-                    Explore listings
+                    {{ t('marketplace.search.submit', 'Explore listings') }}
                 </button>
                 {% if query or state or district or category %}
                 <a href="{{ url_for('marketplace') }}" class="btn-outline-app justify-center">
                     <i class="fa-solid fa-rotate-left"></i>
-                    Reset
+                    {{ t('marketplace.search.reset', 'Reset') }}
                 </a>
                 {% endif %}
             </div>
@@ -108,14 +106,13 @@
         <div>
             <span class="section-kicker">
                 <i class="fa-solid fa-basket-shopping"></i>
-                Marketplace
+                {{ t('marketplace.results.kicker', 'Marketplace') }}
             </span>
-            <h2 class="mt-3 font-display text-[1.95rem] font-bold text-soil sm:text-[2.25rem]">Fresh listings ready to order</h2>
-            <p class="mt-2 max-w-2xl text-sm leading-6 text-ink/68 sm:text-base">Every card highlights farm origin,
-                stock, category, and direct purchase controls.</p>
+            <h2 class="mt-3 font-display text-[1.95rem] font-bold text-soil sm:text-[2.25rem]">{{ t('marketplace.results.title', 'Fresh listings ready to order') }}</h2>
+            <p class="mt-2 max-w-2xl text-sm leading-6 text-ink/68 sm:text-base">{{ t('marketplace.results.description', 'Every card highlights farm origin, stock, category, and direct purchase controls.') }}</p>
         </div>
         <div class="rounded-full border border-soil/10 bg-white/70 px-4 py-2 text-sm font-semibold text-ink/70">
-            {{ crops|length }} result{% if crops|length != 1 %}s{% endif %}
+            {{ t('marketplace.results.count', '{count} result{suffix}', count=crops|length, suffix='' if crops|length == 1 else 's') }}
         </div>
     </div>
 
@@ -132,9 +129,9 @@
                 </div>
                 {% endif %}
                 <div class="absolute left-4 top-4 flex flex-wrap gap-2">
-                    <span class="badge-app badge-neutral">{{ crop.category or 'General' }}</span>
+                    <span class="badge-app badge-neutral">{{ crop.category or t('marketplace.card.general', 'General') }}</span>
                     {% if crop.is_verified %}
-                    <span class="badge-app badge-success"><i class="fa-solid fa-badge-check"></i> Verified</span>
+                    <span class="badge-app badge-success"><i class="fa-solid fa-badge-check"></i> {{ t('marketplace.badge.verified', 'Verified growers') }}</span>
                     {% endif %}
                 </div>
             </div>
@@ -144,11 +141,11 @@
                     <h3 class="font-display text-[1.45rem] font-bold text-soil">{{ crop.name }}</h3>
                     <p class="mt-1 text-sm font-semibold text-ink/62">
                         <i class="fa-solid fa-location-dot text-leaf"></i>
-                        {{ crop.village or crop.farmer_city or 'Local source' }}, {{ crop.district or crop.state }}
+                        {{ crop.village or crop.farmer_city or t('marketplace.card.local_source', 'Local source') }}, {{ crop.district or crop.state }}
                     </p>
                 </div>
                 <div class="text-right">
-                    <p class="text-xs font-bold uppercase tracking-[0.2em] text-ink/45">Price</p>
+                    <p class="text-xs font-bold uppercase tracking-[0.2em] text-ink/45">{{ t('marketplace.card.price', 'Price') }}</p>
                     <p class="font-display text-[2rem] font-bold text-soil">&#8377;{{ crop.price }}</p>
                 </div>
             </div>
@@ -158,7 +155,7 @@
                 <span class="badge-app badge-warning"><i class="fa-solid fa-award"></i> {{ crop.quality }}</span>
                 {% endif %}
                 <span class="badge-app badge-info"><i class="fa-solid fa-boxes-stacked"></i> {{ crop.quantity }} kg
-                    available</span>
+                    {{ t('marketplace.card.available', 'available') }}</span>
             </div>
 
             <div class="mt-5 rounded-[1.3rem] bg-mist/70 p-4">
@@ -170,7 +167,7 @@
                     </div>
                     <div>
                         <p class="font-bold text-soil">{{ crop.farmer_name }}</p>
-                        <p>Farmer profile and trust details</p>
+                        <p>{{ t('marketplace.card.profile', 'Farmer profile and trust details') }}</p>
                     </div>
                 </a>
             </div>
@@ -178,13 +175,13 @@
             <form action="{{ url_for('place_order') }}" method="POST" class="mt-5 grid gap-3 sm:grid-cols-[0.7fr_1.3fr]">
                 <input type="hidden" name="crop_id" value="{{ crop.id }}">
                 <div>
-                    <label class="field-label" for="quantity-{{ crop.id }}">Qty (kg)</label>
+                    <label class="field-label" for="quantity-{{ crop.id }}">{{ t('marketplace.card.quantity', 'Qty (kg)') }}</label>
                     <input id="quantity-{{ crop.id }}" class="input-shell" type="number" name="quantity" min="0.1"
                         step="0.1" value="1">
                 </div>
                 <div class="self-end">
                     <button type="submit" class="btn-primary-app w-full">
-                        Buy now
+                        {{ t('marketplace.card.buy', 'Buy now') }}
                         <i class="fa-solid fa-arrow-right"></i>
                     </button>
                 </div>
@@ -195,9 +192,8 @@
             <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-mist text-2xl text-leaf/55">
                 <i class="fa-solid fa-magnifying-glass"></i>
             </div>
-            <h3 class="mt-5 font-display text-[2rem] font-bold text-soil">No crops matched your search</h3>
-            <p class="mx-auto mt-3 max-w-xl text-sm leading-6 text-ink/65 sm:text-base">Try adjusting the region or
-                category filters, or remove search terms to explore more nearby harvests.</p>
+            <h3 class="mt-5 font-display text-[2rem] font-bold text-soil">{{ t('marketplace.empty.title', 'No crops matched your search') }}</h3>
+            <p class="mx-auto mt-3 max-w-xl text-sm leading-6 text-ink/65 sm:text-base">{{ t('marketplace.empty.description', 'Try adjusting the region or category filters, or remove search terms to explore more nearby harvests.') }}</p>
         </div>
         {% endfor %}
     </div>
@@ -222,7 +218,7 @@
 
     function updateDistricts() {
         const selectedState = stateSelect.value;
-        districtSelect.innerHTML = '<option value="">All districts</option>';
+        districtSelect.innerHTML = {{ ('<option value="">' ~ t('marketplace.search.all_districts', 'All districts') ~ '</option>')|tojson }};
 
         if (selectedState && locationData[selectedState]) {
             locationData[selectedState].forEach((district) => {

@@ -12,6 +12,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 
 from database import get_db_connection, init_db
+from translations import DEFAULT_LANGUAGE, LANGUAGE_OPTIONS, TRANSLATIONS
 
 app = Flask(__name__)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -71,6 +72,94 @@ BLOCKED_EMAIL_DOMAINS = {
     "test.com",
     "test.local",
 }
+OTP_SCOPE_CONFIG = {
+    "user": {"session_key_prefix": "", "audience_label": "login"},
+    "admin": {"session_key_prefix": "admin_", "audience_label": "admin login"},
+    "password_reset": {"session_key_prefix": "password_reset_", "audience_label": "password reset"},
+}
+STATUS_TRANSLATION_KEYS = {
+    "pending": "status.pending",
+    "Paid": "status.paid",
+    "Order Confirmed": "status.order_confirmed",
+    "Packed": "status.packed",
+    "Shipped": "status.shipped",
+    "Out for Delivery": "status.out_for_delivery",
+    "Delivered": "status.delivered",
+    "Cancelled": "status.cancelled",
+    "Completed": "status.completed",
+    "Order Placed": "status.order_placed",
+    "Standard": "status.standard",
+    "Verified": "status.verified",
+}
+ROLE_TRANSLATION_KEYS = {
+    "admin": "role.admin",
+    "farmer": "role.farmer",
+    "customer": "role.customer",
+}
+
+
+def normalize_language(language_code):
+    if not language_code:
+        return DEFAULT_LANGUAGE
+    normalized = language_code.strip().lower()
+    return normalized if any(normalized == code for code, _ in LANGUAGE_OPTIONS) else DEFAULT_LANGUAGE
+
+
+def get_current_language():
+    return normalize_language(session.get("lang"))
+
+
+def translate(key, default=None, language=None, **kwargs):
+    language_code = normalize_language(language or get_current_language())
+    localized_catalog = TRANSLATIONS.get(language_code, {})
+    template = localized_catalog.get(key, default or key)
+    try:
+        return template.format(**kwargs) if kwargs else template
+    except Exception:
+        return template
+
+
+def get_language_options():
+    return [{"code": code, "label": label} for code, label in LANGUAGE_OPTIONS]
+
+
+def translate_status(value):
+    return translate(STATUS_TRANSLATION_KEYS.get(value, ""), default=value) if value else value
+
+
+def translate_role(value):
+    return translate(ROLE_TRANSLATION_KEYS.get(value, ""), default=value.title() if value else value) if value else value
+
+
+def get_otp_scope_config(scope):
+    return OTP_SCOPE_CONFIG.get(scope, OTP_SCOPE_CONFIG["user"])
+
+
+def get_otp_session_prefix(scope):
+    return get_otp_scope_config(scope)["session_key_prefix"]
+
+
+def clear_session_otp(scope):
+    prefix = get_otp_session_prefix(scope)
+    session.pop(f"{prefix}temp_otp", None)
+    session.pop(f"{prefix}otp_time", None)
+    session.pop(f"{prefix}otp_email", None)
+
+
+def clear_password_reset_session():
+    clear_session_otp("password_reset")
+    session.pop("password_reset_user_id", None)
+    session.pop("password_reset_email", None)
+    session.pop("password_reset_verified", None)
+
+
+def sanitize_next_url(target):
+    if not target:
+        return url_for("index")
+    cleaned = target.strip()
+    if not cleaned.startswith("/") or cleaned.startswith("//"):
+        return url_for("index")
+    return cleaned
 
 
 class MailDeliveryError(Exception):
@@ -88,41 +177,59 @@ def normalize_mail_exception(exc):
     if isinstance(exc, smtplib.SMTPAuthenticationError):
         return MailDeliveryError(
             "smtp_auth_failed",
-            "OTP email delivery is unavailable right now. Check the Gmail SMTP credentials in .env.",
+            translate(
+                "mail.smtp_auth_failed",
+                default="OTP email delivery is unavailable right now. Check the Gmail SMTP credentials in .env.",
+            ),
             status_code=500,
             detail=str(exc),
         )
     if isinstance(exc, smtplib.SMTPRecipientsRefused):
         return MailDeliveryError(
             "recipient_rejected",
-            "That email address cannot receive OTP messages. Use a real inbox address.",
+            translate(
+                "mail.recipient_rejected",
+                default="That email address cannot receive OTP messages. Use a real inbox address.",
+            ),
             status_code=400,
             detail=str(exc),
         )
     if isinstance(exc, smtplib.SMTPSenderRefused):
         return MailDeliveryError(
             "sender_rejected",
-            "The sender email is being rejected by Gmail. Check MAIL_DEFAULT_SENDER and MAIL_USERNAME.",
+            translate(
+                "mail.sender_rejected",
+                default="The sender email is being rejected by Gmail. Check MAIL_DEFAULT_SENDER and MAIL_USERNAME.",
+            ),
             status_code=500,
             detail=str(exc),
         )
     if isinstance(exc, (socket.timeout, TimeoutError, smtplib.SMTPServerDisconnected, OSError)):
         return MailDeliveryError(
             "smtp_timeout",
-            "OTP delivery timed out. Please try again in a moment.",
+            translate(
+                "mail.smtp_timeout",
+                default="OTP delivery timed out. Please try again in a moment.",
+            ),
             status_code=502,
             detail=str(exc),
         )
     if isinstance(exc, smtplib.SMTPException):
         return MailDeliveryError(
             "smtp_error",
-            "OTP email delivery failed. Please try again.",
+            translate(
+                "mail.smtp_error",
+                default="OTP email delivery failed. Please try again.",
+            ),
             status_code=502,
             detail=str(exc),
         )
     return MailDeliveryError(
         "mail_delivery_failed",
-        "We could not send the OTP email right now. Please try again.",
+        translate(
+            "mail.delivery_failed",
+            default="We could not send the OTP email right now. Please try again.",
+        ),
         status_code=500,
         detail=str(exc),
     )
@@ -218,7 +325,10 @@ def send_email(recipient, subject, body):
     if not smtp_ready():
         raise MailDeliveryError(
             "smtp_not_configured",
-            "OTP email delivery is not configured. Check the Gmail SMTP settings in .env.",
+            translate(
+                "mail.not_configured",
+                default="OTP email delivery is not configured. Check the Gmail SMTP settings in .env.",
+            ),
             status_code=500,
         )
 
@@ -232,6 +342,80 @@ def send_email(recipient, subject, body):
         mail.send(message)
     except Exception as exc:
         raise normalize_mail_exception(exc) from exc
+
+
+def record_order_update(conn, order_id, status, location=""):
+    conn.execute(
+        'INSERT INTO order_updates (order_id, status, location) VALUES (?, ?, ?)',
+        (order_id, status, location or ''),
+    )
+
+
+def get_order_notification_context(conn, order_id):
+    return conn.execute(
+        '''
+        SELECT
+            o.*,
+            c.name AS crop_name,
+            c.farmer_id AS farmer_id,
+            customer.full_name AS customer_name,
+            customer.email AS customer_email,
+            farmer.full_name AS farmer_name,
+            farmer.email AS farmer_email
+        FROM orders o
+        JOIN crops c ON o.crop_id = c.id
+        JOIN users customer ON o.customer_id = customer.id
+        JOIN users farmer ON c.farmer_id = farmer.id
+        WHERE o.id = ?
+        ''',
+        (order_id,),
+    ).fetchone()
+
+
+def try_send_email(recipient, subject, body, context_label):
+    try:
+        send_email(recipient, subject, body)
+    except Exception:
+        logger.exception("Mail failed for %s (%s)", recipient, context_label)
+
+
+def notify_farmer_new_order(order):
+    if not order or not order['farmer_email']:
+        return
+
+    try_send_email(
+        order['farmer_email'],
+        "New Order Request - Smart Farmer Market",
+        (
+            f"Hello {order['farmer_name']},\n\n"
+            f"You have received a new order request for {order['crop_name']}.\n"
+            f"Customer: {order['customer_name']}\n"
+            f"Quantity: {order['quantity']} kg\n"
+            f"Order value: Rs. {order['total_price']:.2f}\n"
+            f"Estimated delivery: {order['estimated_delivery']}\n\n"
+            "Please review the order in your farmer dashboard and approve it when ready."
+        ),
+        f"new-order-{order['id']}",
+    )
+
+
+def notify_customer_farmer_approved(order):
+    if not order or not order['customer_email']:
+        return
+
+    try_send_email(
+        order['customer_email'],
+        "Farmer Approved Your Order - Smart Farmer Market",
+        (
+            f"Hello {order['customer_name']},\n\n"
+            f"The farmer has approved your order for {order['crop_name']}.\n"
+            f"Farmer: {order['farmer_name']}\n"
+            f"Quantity: {order['quantity']} kg\n"
+            f"Order value: Rs. {order['total_price']:.2f}\n\n"
+            "You can track the latest status from your customer dashboard."
+        ),
+        f"farmer-approved-{order['id']}",
+    )
 
 
 def purge_old_otp_requests(conn, scope, email):
@@ -277,9 +461,13 @@ def send_otp_email(email, otp, audience_label):
 
 
 def issue_session_otp(email, scope="user"):
+    scope_config = get_otp_scope_config(scope)
     if is_blocked_email_domain(email):
         return json_error(
-            "Use a real email inbox. Example or test domains cannot receive OTP emails.",
+            translate(
+                "otp.invalid_email_domain",
+                default="Use a real email inbox. Example or test domains cannot receive OTP emails.",
+            ),
             "invalid_email_domain",
             status=400,
         )
@@ -289,7 +477,11 @@ def issue_session_otp(email, scope="user"):
     if scope != "admin" and remaining <= 0:
         conn.close()
         return json_error(
-            "OTP request limit reached. You can request up to 3 codes per hour.",
+            translate(
+                "otp.rate_limited",
+                default="OTP request limit reached. You can request up to 3 codes per hour.",
+                limit=app.config["OTP_MAX_PER_HOUR"],
+            ),
             "otp_rate_limited",
             status=429,
             extra={"remaining_requests": 0},
@@ -298,14 +490,14 @@ def issue_session_otp(email, scope="user"):
     otp = f"{random.randint(0, 999999):06d}"
 
     try:
-        send_otp_email(email, otp, "admin login" if scope == "admin" else "login")
+        send_otp_email(email, otp, scope_config["audience_label"])
     except Exception as exc:
         exc = normalize_mail_exception(exc)
         logger.error("OTP email delivery failed for %s [%s]: %s", email, exc.error_code, exc.detail)
         conn.close()
         return json_error(exc.user_message, exc.error_code, status=exc.status_code)
 
-    session_key_prefix = "admin_" if scope == "admin" else ""
+    session_key_prefix = scope_config["session_key_prefix"]
     session[f"{session_key_prefix}temp_otp"] = otp
     session[f"{session_key_prefix}otp_time"] = time.time()
     session[f"{session_key_prefix}otp_email"] = email
@@ -316,14 +508,37 @@ def issue_session_otp(email, scope="user"):
     extra = {"otp": None, "remaining_requests": remaining_after_send}
     if app.config["TESTING"] or app.config["EXPOSE_TEST_OTP"]:
         extra["otp"] = otp
-    return json_success(f"OTP sent to {email}. Check your inbox.", extra=extra)
+    return json_success(
+        translate("otp.sent", default="OTP sent to {email}. Check your inbox.", email=email),
+        extra=extra,
+    )
+
+
+def validate_session_otp(email, user_otp, scope="user"):
+    prefix = get_otp_session_prefix(scope)
+    session_otp = session.get(f"{prefix}temp_otp")
+    otp_time = session.get(f"{prefix}otp_time", 0)
+    otp_email = session.get(f"{prefix}otp_email")
+
+    if not session_otp or otp_email != email:
+        return "otp_not_requested"
+    if time.time() - otp_time > app.config["OTP_EXPIRY_SECONDS"]:
+        return "otp_expired"
+    if user_otp != session_otp:
+        return "invalid_otp"
+    return None
 
 
 @app.context_processor
 def inject_template_config():
     return {
+        "current_language": get_current_language(),
+        "language_options": get_language_options(),
         "otp_expiry_seconds": app.config["OTP_EXPIRY_SECONDS"],
         "otp_expiry_minutes": max(app.config["OTP_EXPIRY_SECONDS"] // 60, 1),
+        "t": translate,
+        "t_role": translate_role,
+        "t_status": translate_status,
     }
 
 
@@ -349,6 +564,12 @@ def index():
         else:
             return redirect(url_for('marketplace'))
     return redirect(url_for('login'))
+
+
+@app.route('/set_language', methods=['POST'])
+def set_language():
+    session["lang"] = normalize_language(request.form.get("language"))
+    return redirect(sanitize_next_url(request.form.get("next")))
 
 @app.route('/marketplace')
 def marketplace():
@@ -391,7 +612,11 @@ def marketplace():
     states = ["Telangana", "Andhra Pradesh", "Karnataka", "Tamil Nadu", "Maharashtra", "Kerala", "Odisha"]
     
     # Personalization tracking
-    welcome_msg = "Welcome Back" if session.get('has_visited') else "Welcome"
+    welcome_message = (
+        translate("marketplace.kicker.welcome_back", default="Welcome Back to the network")
+        if session.get('has_visited')
+        else translate("marketplace.kicker.welcome", default="Welcome to the network")
+    )
     session['has_visited'] = True
     
     conn.close()
@@ -400,7 +625,7 @@ def marketplace():
                           state=state, district=district,
                           category=category, 
                           categories=categories, states=states, 
-                          welcome_msg=welcome_msg)
+                          welcome_message=welcome_message)
 
 @app.route('/request_otp', methods=['POST'])
 def request_otp():
@@ -408,7 +633,12 @@ def request_otp():
     email = normalize_email(request.form.get('email'))
 
     if not email or email != session.get('pre_auth_email'):
-        return json_error('Start from login before requesting an OTP.', 'login_required', status=400, extra={'otp': None})
+        return json_error(
+            translate("otp.login_required", default="Start from login before requesting an OTP."),
+            'login_required',
+            status=400,
+            extra={'otp': None},
+        )
 
     conn = get_db_connection()
     user = conn.execute(
@@ -418,7 +648,12 @@ def request_otp():
     conn.close()
 
     if not user:
-        return json_error('This email is not registered', 'email_not_registered', status=404, extra={'otp': None})
+        return json_error(
+            translate("otp.email_not_registered", default="This email is not registered"),
+            'email_not_registered',
+            status=404,
+            extra={'otp': None},
+        )
 
     return issue_session_otp(email, scope="user")
 
@@ -434,20 +669,20 @@ def login():
         conn.close()
 
         if not user or not verify_password(user['password'], password):
-            flash('Invalid email or password', 'error')
+            flash(translate("auth.flash.invalid_credentials", default='Invalid email or password'), 'error')
             return redirect(url_for('login'))
 
         session['pre_auth_user_id'] = user['id']
         session['pre_auth_email'] = email
         return redirect(url_for('verify'))
             
-    return render_template('auth.html', mode='login')
+    return render_template('auth.html', mode='login', form_action=url_for('login'))
 
 @app.route('/verify', methods=['GET', 'POST'])
 def verify():
     prepare_auth_runtime()
     if 'pre_auth_user_id' not in session:
-        flash('Please login first', 'error')
+        flash(translate("auth.flash.login_first", default='Please login first'), 'error')
         return redirect(url_for('login'))
 
     if request.method == 'POST':
@@ -455,27 +690,34 @@ def verify():
         email = normalize_email(request.form.get('email'))
         user_otp = (request.form.get('otp') or '').strip().replace(' ', '')
         user_id = session.get('pre_auth_user_id')
-        
-        session_otp = session.get('temp_otp')
-        otp_time = session.get('otp_time', 0)
-        otp_email = session.get('otp_email')
 
-        if not session_otp or otp_email != email:
+        otp_error = validate_session_otp(email, user_otp, scope="user")
+        if otp_error == 'otp_not_requested':
             if expects_json:
-                return json_error('Request a fresh OTP before verifying.', 'otp_not_requested', status=400)
-            flash('Invalid OTP or email', 'error')
+                return json_error(
+                    translate("otp.request_fresh", default='Request a fresh OTP before verifying.'),
+                    'otp_not_requested',
+                    status=400,
+                )
+            flash(translate("otp.invalid_login_combo", default='Invalid OTP or email'), 'error')
             return redirect(url_for('verify'))
-
-        if time.time() - otp_time > app.config['OTP_EXPIRY_SECONDS']:
+        if otp_error == 'otp_expired':
             if expects_json:
-                return json_error('OTP has expired. Request a new code.', 'otp_expired', status=400)
-            flash('OTP has expired. Please request a new one.', 'error')
+                return json_error(
+                    translate("otp.expired", default='OTP has expired. Request a new code.'),
+                    'otp_expired',
+                    status=400,
+                )
+            flash(translate("otp.expired", default='OTP has expired. Request a new code.'), 'error')
             return redirect(url_for('verify'))
-
-        if user_otp != session_otp:
+        if otp_error == 'invalid_otp':
             if expects_json:
-                return json_error('Incorrect OTP. Enter the latest code from your inbox.', 'invalid_otp', status=400)
-            flash('Invalid OTP', 'error')
+                return json_error(
+                    translate("otp.invalid", default='Incorrect OTP. Enter the latest code from your inbox.'),
+                    'invalid_otp',
+                    status=400,
+                )
+            flash(translate("otp.invalid", default='Incorrect OTP. Enter the latest code from your inbox.'), 'error')
             return redirect(url_for('verify'))
         
         # Success! Finalize Login
@@ -483,11 +725,10 @@ def verify():
         user = conn.execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
         conn.close()
         
-        session.pop('temp_otp', None)
-        session.pop('otp_time', None)
-        session.pop('otp_email', None)
+        clear_session_otp("user")
         session.pop('pre_auth_user_id', None)
         session.pop('pre_auth_email', None)
+        clear_password_reset_session()
         
         session['user_id'] = user['id']
         session['username'] = user['username']
@@ -506,7 +747,12 @@ def verify():
             return json_success('OTP verified successfully.', extra={'redirect': destination})
         return redirect(destination)
             
-    return render_template('auth.html', mode='verify', email=session.get('pre_auth_email'))
+    return render_template(
+        'auth.html',
+        mode='verify',
+        email=session.get('pre_auth_email'),
+        form_action=url_for('verify'),
+    )
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -523,11 +769,17 @@ def register():
         pincode = request.form.get('pincode', '')
         
         if not username or not email or not password:
-            flash('Username, email, and password are required', 'error')
+            flash(translate("auth.flash.required_fields", default='Username, email, and password are required'), 'error')
             return redirect(url_for('register'))
 
         if is_blocked_email_domain(email):
-            flash('Use a real email inbox. Example or test domains are blocked for OTP delivery.', 'error')
+            flash(
+                translate(
+                    "auth.flash.real_email_required",
+                    default='Use a real email inbox. Example or test domains are blocked for OTP delivery.',
+                ),
+                'error',
+            )
             return redirect(url_for('register'))
         
         conn = get_db_connection()
@@ -537,20 +789,236 @@ def register():
                 (username, email, generate_password_hash(password), role, full_name, city, state, district, pincode)
             )
             conn.commit()
-            flash('Registration successful! Please login.', 'success')
+            flash(translate("auth.flash.register_success", default='Registration successful! Please login.'), 'success')
             return redirect(url_for('login'))
         except Exception as e:
-            flash('Username or email already exists', 'error')
+            flash(translate("auth.flash.username_exists", default='Username or email already exists'), 'error')
         finally:
             conn.close()
 
-    return render_template('auth.html', mode='register')
+    return render_template('auth.html', mode='register', form_action=url_for('register'))
+
+
+@app.route('/forgot_password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        prepare_auth_runtime()
+        email = normalize_email(request.form.get('email'))
+        if not email:
+            flash(
+                translate(
+                    "auth.flash.reset_email_required",
+                    default='Enter your registered email to reset your password.',
+                ),
+                'error',
+            )
+            return redirect(url_for('forgot_password'))
+
+        conn = get_db_connection()
+        user = conn.execute('SELECT id, email FROM users WHERE lower(email) = ?', (email,)).fetchone()
+        conn.close()
+
+        if not user:
+            flash(
+                translate(
+                    "auth.flash.reset_email_not_found",
+                    default='No account was found for that email address.',
+                ),
+                'error',
+            )
+            return redirect(url_for('forgot_password'))
+
+        clear_password_reset_session()
+        session['password_reset_user_id'] = user['id']
+        session['password_reset_email'] = email
+        session['password_reset_verified'] = False
+        return redirect(url_for('verify_reset_otp'))
+
+    return render_template('auth.html', mode='forgot_password', form_action=url_for('forgot_password'))
+
+
+@app.route('/request_password_reset_otp', methods=['POST'])
+def request_password_reset_otp():
+    prepare_auth_runtime()
+    email = normalize_email(request.form.get('email'))
+
+    if not email or email != session.get('password_reset_email') or not session.get('password_reset_user_id'):
+        return json_error(
+            translate(
+                "otp.reset_required",
+                default='Start the password reset flow before requesting a new OTP.',
+            ),
+            'password_reset_required',
+            status=400,
+            extra={'otp': None},
+        )
+
+    conn = get_db_connection()
+    user = conn.execute(
+        'SELECT id FROM users WHERE id = ? AND lower(email) = ?',
+        (session.get('password_reset_user_id'), email),
+    ).fetchone()
+    conn.close()
+
+    if not user:
+        return json_error(
+            translate("otp.email_not_registered", default='This email is not registered'),
+            'email_not_registered',
+            status=404,
+            extra={'otp': None},
+        )
+
+    return issue_session_otp(email, scope="password_reset")
+
+
+@app.route('/reset_password/verify', methods=['GET', 'POST'])
+def verify_reset_otp():
+    prepare_auth_runtime()
+    if not session.get('password_reset_user_id') or not session.get('password_reset_email'):
+        flash(
+            translate(
+                "otp.reset_required",
+                default='Start the password reset flow before requesting a new OTP.',
+            ),
+            'error',
+        )
+        return redirect(url_for('forgot_password'))
+
+    if request.method == 'POST':
+        expects_json = (request.form.get('response_mode') == 'json')
+        email = normalize_email(request.form.get('email'))
+        user_otp = (request.form.get('otp') or '').strip().replace(' ', '')
+
+        otp_error = validate_session_otp(email, user_otp, scope="password_reset")
+        if otp_error == 'otp_not_requested':
+            if expects_json:
+                return json_error(
+                    translate("otp.request_fresh", default='Request a fresh OTP before verifying.'),
+                    'otp_not_requested',
+                    status=400,
+                )
+            flash(translate("otp.invalid_login_combo", default='Invalid OTP or email'), 'error')
+            return redirect(url_for('verify_reset_otp'))
+        if otp_error == 'otp_expired':
+            if expects_json:
+                return json_error(
+                    translate("otp.expired", default='OTP has expired. Request a new code.'),
+                    'otp_expired',
+                    status=400,
+                )
+            flash(translate("otp.expired", default='OTP has expired. Request a new code.'), 'error')
+            return redirect(url_for('verify_reset_otp'))
+        if otp_error == 'invalid_otp':
+            if expects_json:
+                return json_error(
+                    translate("otp.invalid", default='Incorrect OTP. Enter the latest code from your inbox.'),
+                    'invalid_otp',
+                    status=400,
+                )
+            flash(translate("otp.invalid", default='Incorrect OTP. Enter the latest code from your inbox.'), 'error')
+            return redirect(url_for('verify_reset_otp'))
+
+        clear_session_otp("password_reset")
+        session['password_reset_verified'] = True
+        destination = url_for('reset_password')
+        if expects_json:
+            return json_success('OTP verified successfully.', extra={'redirect': destination})
+        return redirect(destination)
+
+    return render_template(
+        'auth.html',
+        mode='reset_verify',
+        email=session.get('password_reset_email'),
+        form_action=url_for('verify_reset_otp'),
+    )
+
+
+@app.route('/reset_password', methods=['GET', 'POST'])
+def reset_password():
+    prepare_auth_runtime()
+    if not session.get('password_reset_user_id') or not session.get('password_reset_email'):
+        flash(
+            translate(
+                "otp.reset_required",
+                default='Start the password reset flow before requesting a new OTP.',
+            ),
+            'error',
+        )
+        return redirect(url_for('forgot_password'))
+    if not session.get('password_reset_verified'):
+        flash(
+            translate(
+                "auth.flash.reset_verified_required",
+                default='Complete OTP verification before setting a new password.',
+            ),
+            'error',
+        )
+        return redirect(url_for('verify_reset_otp'))
+
+    if request.method == 'POST':
+        new_password = request.form.get('password', '')
+        confirm_password = request.form.get('confirm_password', '')
+
+        if not new_password or not confirm_password:
+            flash(
+                translate(
+                    "auth.flash.reset_passwords_required",
+                    default='Both the new password and confirmation are required.',
+                ),
+                'error',
+            )
+            return redirect(url_for('reset_password'))
+        if new_password != confirm_password:
+            flash(
+                translate(
+                    "auth.flash.reset_passwords_match",
+                    default='The new password and confirmation must match.',
+                ),
+                'error',
+            )
+            return redirect(url_for('reset_password'))
+        if len(new_password) < 8:
+            flash(
+                translate(
+                    "auth.flash.reset_password_length",
+                    default='The new password must be at least 8 characters long.',
+                ),
+                'error',
+            )
+            return redirect(url_for('reset_password'))
+
+        conn = get_db_connection()
+        conn.execute(
+            'UPDATE users SET password = ? WHERE id = ?',
+            (generate_password_hash(new_password), session.get('password_reset_user_id')),
+        )
+        conn.commit()
+        conn.close()
+
+        clear_password_reset_session()
+        flash(
+            translate(
+                "auth.flash.reset_success",
+                default='Password updated successfully. Login now with your new password.',
+            ),
+            'success',
+        )
+        return redirect(url_for('login'))
+
+    return render_template(
+        'auth.html',
+        mode='reset_password',
+        email=session.get('password_reset_email'),
+        form_action=url_for('reset_password'),
+    )
 
 @app.route('/logout')
 def logout():
     has_visited = session.get('has_visited', False)
+    selected_language = get_current_language()
     session.clear()
     session['has_visited'] = has_visited # Keep visit history after logout
+    session['lang'] = selected_language
     return redirect(url_for('index'))
 
 # --- Farmer Routes ---
@@ -589,17 +1057,33 @@ def farmer_update_order():
     conn = get_db_connection()
     # Verify the order belongs to this farmer's crop
     order = conn.execute('''
-        SELECT o.* FROM orders o
+        SELECT
+            o.*,
+            c.name AS crop_name,
+            customer.full_name AS customer_name,
+            customer.email AS customer_email,
+            farmer.full_name AS farmer_name
+        FROM orders o
         JOIN crops c ON o.crop_id = c.id
+        JOIN users customer ON o.customer_id = customer.id
+        JOIN users farmer ON c.farmer_id = farmer.id
         WHERE o.id = ? AND c.farmer_id = ?
     ''', (order_id, session['user_id'])).fetchone()
     
     if order:
         conn.execute('UPDATE orders SET status = ?, current_location = ? WHERE id = ?', (new_status, location, order_id))
-        # Add tracking update
-        conn.execute('INSERT INTO order_updates (order_id, status, location) VALUES (?, ?, ?)',
-                     (order_id, new_status, location))
+        record_order_update(conn, order_id, new_status, location)
         conn.commit()
+
+        if new_status == 'Order Confirmed' and order['status'] != 'Order Confirmed':
+            notify_customer_farmer_approved(
+                {
+                    **dict(order),
+                    'status': new_status,
+                    'current_location': location,
+                }
+            )
+
         flash(f'Order #{order_id} status updated to {new_status}', 'success')
     else:
         flash('Order not found or unauthorized', 'error')
@@ -804,12 +1288,11 @@ def place_order():
         
         order_id = cursor.lastrowid
         
-        # Add initial tracking update
-        conn.execute('INSERT INTO order_updates (order_id, status, location) VALUES (?, ?, ?)',
-                     (order_id, 'Order Placed', farmer['city'] or farmer['state']))
+        record_order_update(conn, order_id, 'Order Placed', farmer['city'] or farmer['state'])
         
         conn.execute('UPDATE crops SET quantity = quantity - ? WHERE id = ?', (quantity, crop_id))
         conn.commit()
+        notify_farmer_new_order(get_order_notification_context(conn, order_id))
         flash('Order placed! Proceed to payment.', 'success')
         conn.close()
         return redirect(url_for('checkout', order_id=order_id))
@@ -861,11 +1344,9 @@ def cancel_order(order_id):
     order = conn.execute('SELECT * FROM orders WHERE id = ? AND customer_id = ?', (order_id, session['user_id'])).fetchone()
     
     if order:
-        if order['status'] in ['pending', 'Paid', 'Confirmed']:
+        if order['status'] in ['pending', 'Paid', 'Order Confirmed']:
             conn.execute('UPDATE orders SET status = "Cancelled" WHERE id = ?', (order_id,))
-            # Add tracking update
-            conn.execute('INSERT INTO order_updates (order_id, status, location) VALUES (?, ?, ?)',
-                         (order_id, 'Cancelled', 'System'))
+            record_order_update(conn, order_id, 'Cancelled', 'System')
             conn.commit()
             flash('Order has been cancelled successfully.', 'success')
         else:
@@ -910,6 +1391,7 @@ def confirm_payment():
     
     if order:
         conn.execute('UPDATE orders SET status = "Paid" WHERE id = ?', (order_id,))
+        record_order_update(conn, order_id, 'Paid', order['current_location'] or 'Payment confirmed')
         conn.commit()
 
         try:
@@ -1064,6 +1546,9 @@ def admin_update_order(id):
     status = request.form['status']
     conn = get_db_connection()
     conn.execute('UPDATE orders SET status = ? WHERE id = ?', (status, id))
+    order = get_order_notification_context(conn, id)
+    if order:
+        record_order_update(conn, id, status, order['current_location'] or 'Admin dashboard')
     conn.commit()
     conn.close()
     flash(f'Order #{id} status updated to {status}', 'success')

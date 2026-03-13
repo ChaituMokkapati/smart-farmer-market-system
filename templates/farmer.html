@@ -1,50 +1,49 @@
 {% extends "base.html" %}
 
 {% block content %}
-<section class="surface-panel reveal rounded-[1.8rem] px-5 py-6 sm:px-7 sm:py-8">
-    <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+<section class="surface-panel reveal dashboard-shell dashboard-shell-farmer rounded-[1.8rem] px-5 py-6 sm:px-7 sm:py-8">
+    <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between dashboard-shell-head">
         <div>
             <span class="section-kicker">
                 <i class="fa-solid fa-tractor"></i>
-                Farmer workspace
+                {{ t('farmer.dashboard.kicker', 'Farmer workspace') }}
             </span>
-            <h1 class="mt-4 font-display text-3xl font-bold text-soil sm:text-[2.7rem]">Run your harvest operation</h1>
-            <p class="mt-3 max-w-2xl text-sm leading-6 text-ink/70">Manage fresh listings, watch incoming orders,
-                and keep your storefront updated with a single operational dashboard.</p>
+            <h1 class="mt-4 font-display text-3xl font-bold text-soil sm:text-[2.7rem]">{{ t('farmer.dashboard.title', 'Run your harvest operation') }}</h1>
+            <p class="mt-3 max-w-2xl text-sm leading-6 text-ink/70">{{ t('farmer.dashboard.description', 'Manage fresh listings, watch incoming orders, and keep your storefront updated with a single operational dashboard.') }}</p>
         </div>
         <div>
             {% if is_verified %}
             <span class="badge-app badge-success">
                 <i class="fa-solid fa-badge-check"></i>
-                Verified partner
+                {{ t('farmer.verified_partner', 'Verified partner') }}
             </span>
             {% else %}
             <span class="badge-app badge-warning">
                 <i class="fa-regular fa-clock"></i>
-                Verification pending
+                {{ t('farmer.verification_pending', 'Verification pending') }}
             </span>
             {% endif %}
         </div>
     </div>
 
-    <div class="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+    <div class="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4 dashboard-shell-metrics">
         <div class="metric-card">
-            <p class="metric-label">Active listings</p>
+            <p class="metric-label">{{ t('farmer.active_listings', 'Active listings') }}</p>
             <p class="metric-value">{{ crops|length }}</p>
         </div>
         <div class="metric-card">
-            <p class="metric-label">Open orders</p>
+            <p class="metric-label">{{ t('farmer.open_orders', 'Open orders') }}</p>
             <p class="metric-value">{{ orders|length }}</p>
         </div>
         <div class="metric-card">
-            <p class="metric-label">Inventory</p>
+            <p class="metric-label">{{ t('farmer.inventory', 'Inventory') }}</p>
             <p class="metric-value">{{ crops|sum(attribute='quantity') if crops else 0 }}</p>
-            <p class="mt-2 text-sm text-ink/62">kg listed across all crops</p>
+            <p class="mt-2 text-sm text-ink/62">{{ t('farmer.inventory_desc', 'kg listed across all crops') }}</p>
         </div>
         <div class="metric-card">
-            <p class="metric-label">Order value</p>
+            <p class="metric-label">{{ t('farmer.order_value', 'Order value') }}</p>
             <p class="metric-value">&#8377;{{ "%.0f"|format(orders|sum(attribute='total_price')) if orders else 0 }}</p>
-            <p class="mt-2 text-sm text-ink/62">Gross order amount in pipeline</p>
+            <p class="mt-2 text-sm text-ink/62">{{ t('farmer.order_value_desc', 'Gross order amount in pipeline') }}</p>
         </div>
     </div>
 </section>
@@ -54,21 +53,20 @@
         <div class="surface-card p-5 sm:p-6">
             <span class="section-kicker">
                 <i class="fa-solid fa-plus"></i>
-                New listing
+                {{ t('farmer.new_listing', 'New listing') }}
             </span>
-            <h2 class="mt-3 font-display text-[1.9rem] font-bold text-soil">List fresh harvest</h2>
-            <p class="mt-2 text-sm leading-6 text-ink/68">Publish crop details, stock, location, and proof to improve
-                buyer confidence.</p>
+            <h2 class="mt-3 font-display text-[1.9rem] font-bold text-soil">{{ t('farmer.list_fresh_harvest', 'List fresh harvest') }}</h2>
+            <p class="mt-2 text-sm leading-6 text-ink/68">{{ t('farmer.list_desc', 'Publish crop details, stock, location, and proof to improve buyer confidence.') }}</p>
 
             <form action="{{ url_for('add_crop') }}" method="POST" enctype="multipart/form-data" class="mt-6 space-y-4">
                 <div>
-                    <label class="field-label" for="name">Product name</label>
+                    <label class="field-label" for="name">{{ t('farmer.form.product_name', 'Product name') }}</label>
                     <input id="name" class="input-shell" type="text" name="name" placeholder="Sona Masuri Rice" required>
                 </div>
 
                 <div class="grid gap-4 sm:grid-cols-2">
                     <div>
-                        <label class="field-label" for="category_select">Category</label>
+                        <label class="field-label" for="category_select">{{ t('farmer.form.category', 'Category') }}</label>
                         <select id="category_select" class="select-shell" name="category" required>
                             <option value="Vegetables">Vegetables</option>
                             <option value="Fruits">Fruits</option>
@@ -87,7 +85,7 @@
                         </select>
                     </div>
                     <div>
-                        <label class="field-label" for="quality">Quality grade</label>
+                        <label class="field-label" for="quality">{{ t('farmer.form.quality_grade', 'Quality grade') }}</label>
                         <select id="quality" class="select-shell" name="quality" required>
                             <option value="A-Grade (Export)">A-Grade (Export Quality)</option>
                             <option value="B-Grade (Premium)">B-Grade (Premium)</option>
@@ -99,7 +97,7 @@
 
                 <div class="grid gap-4 sm:grid-cols-2">
                     <div>
-                        <label class="field-label" for="state">State</label>
+                        <label class="field-label" for="state">{{ t('auth.register.state', 'State') }}</label>
                         <select id="state" class="select-shell" name="state" required>
                             <option value="Telangana">Telangana</option>
                             <option value="Andhra Pradesh">Andhra Pradesh</option>
@@ -111,63 +109,63 @@
                         </select>
                     </div>
                     <div>
-                        <label class="field-label" for="district">District</label>
+                        <label class="field-label" for="district">{{ t('auth.register.district', 'District') }}</label>
                         <input id="district" class="input-shell" type="text" name="district" placeholder="Guntur" required>
                     </div>
                 </div>
 
                 <div class="grid gap-4 sm:grid-cols-2">
                     <div>
-                        <label class="field-label" for="village">Village</label>
+                        <label class="field-label" for="village">{{ t('farmer.form.village', 'Village') }}</label>
                         <input id="village" class="input-shell" type="text" name="village" placeholder="Amaravati" required>
                     </div>
                     <div>
-                        <label class="field-label" for="pincode">Pincode</label>
+                        <label class="field-label" for="pincode">{{ t('auth.register.pincode', 'Pincode') }}</label>
                         <input id="pincode" class="input-shell" type="text" name="pincode" placeholder="522001" required>
                     </div>
                 </div>
 
                 <div class="grid gap-4 sm:grid-cols-2">
                     <div>
-                        <label class="field-label" for="quantity">Quantity</label>
+                        <label class="field-label" for="quantity">{{ t('farmer.form.quantity', 'Quantity') }}</label>
                         <input id="quantity" class="input-shell" type="number" step="0.1" name="quantity"
                             placeholder="100" required>
                     </div>
                     <div>
-                        <label class="field-label" for="harvest_date">Harvest date</label>
+                        <label class="field-label" for="harvest_date">{{ t('farmer.form.harvest_date', 'Harvest date') }}</label>
                         <input id="harvest_date" class="input-shell" type="date" name="harvest_date" required>
                     </div>
                 </div>
 
                 <div>
-                    <label class="field-label" for="product_price">Price per unit</label>
+                    <label class="field-label" for="product_price">{{ t('farmer.form.price_per_unit', 'Price per unit') }}</label>
                     <input id="product_price" class="input-shell" type="number" step="0.01" name="price"
                         placeholder="50.00" required>
                     <div id="price_suggestion" class="mt-2.5 rounded-[1rem] border border-leaf/10 bg-mist/70 px-4 py-3 text-sm font-semibold text-soil">
-                        Select a category for price advice.
+                        {{ t('farmer.form.price_suggestion', 'Select a category for price advice.') }}
                     </div>
                 </div>
 
                 <div class="grid gap-4 sm:grid-cols-2">
                     <div>
-                        <label class="field-label" for="crop_image">Crop image</label>
+                        <label class="field-label" for="crop_image">{{ t('farmer.form.crop_image', 'Crop image') }}</label>
                         <input id="crop_image" class="file-input file-shell" type="file" name="image" accept="image/*">
                     </div>
                     <div>
-                        <label class="field-label" for="quality_proof">Quality proof</label>
+                        <label class="field-label" for="quality_proof">{{ t('farmer.form.quality_proof', 'Quality proof') }}</label>
                         <input id="quality_proof" class="file-input file-shell" type="file" name="quality_proof"
                             accept="image/*" required>
                     </div>
                 </div>
 
                 <div>
-                    <label class="field-label" for="description">Description</label>
+                    <label class="field-label" for="description">{{ t('farmer.form.description', 'Description') }}</label>
                     <textarea id="description" class="textarea-shell" name="description"
                         placeholder="Describe freshness, harvest notes, storage details, or variety traits."></textarea>
                 </div>
 
                 <button type="submit" class="btn-primary-app w-full">
-                    Publish listing
+                    {{ t('farmer.publish_listing', 'Publish listing') }}
                     <i class="fa-solid fa-arrow-up-right-dots"></i>
                 </button>
             </form>
@@ -180,9 +178,9 @@
                 <div>
                     <span class="section-kicker">
                         <i class="fa-solid fa-boxes-stacked"></i>
-                        Inventory
+                        {{ t('farmer.inventory', 'Inventory') }}
                     </span>
-                    <h2 class="mt-3 font-display text-[1.9rem] font-bold text-soil">Active listings</h2>
+                    <h2 class="mt-3 font-display text-[1.9rem] font-bold text-soil">{{ t('farmer.active_listings', 'Active listings') }}</h2>
                 </div>
             </div>
 
@@ -214,12 +212,12 @@
                                 <div class="flex flex-wrap gap-2">
                                     <a href="{{ url_for('edit_crop', id=crop.id) }}" class="btn-outline-app px-4 py-3 text-sm">
                                         <i class="fa-solid fa-pen"></i>
-                                        Edit
+                                        {{ t('farmer.action.edit', 'Edit') }}
                                     </a>
                                     <a href="{{ url_for('delete_crop', id=crop.id) }}" class="btn-danger-app px-4 py-3 text-sm"
                                         onclick="return confirm('Archive this listing?')">
                                         <i class="fa-solid fa-trash"></i>
-                                        Delete
+                                        {{ t('admin.action.delete', 'Delete') }}
                                     </a>
                                 </div>
                             </td>
@@ -230,9 +228,8 @@
             </div>
             {% else %}
             <div class="empty-state mt-6">
-                <h3 class="font-display text-[2rem] font-bold text-soil">No active listings yet</h3>
-                <p class="mx-auto mt-3 max-w-xl text-sm leading-6 text-ink/65 sm:text-base">Publish your first crop to
-                    start appearing in the customer marketplace.</p>
+                <h3 class="font-display text-[2rem] font-bold text-soil">{{ t('farmer.no_active_listings', 'No active listings yet') }}</h3>
+                <p class="mx-auto mt-3 max-w-xl text-sm leading-6 text-ink/65 sm:text-base">{{ t('farmer.no_active_listings_desc', 'Publish your first crop to start appearing in the customer marketplace.') }}</p>
             </div>
             {% endif %}
         </div>
@@ -241,9 +238,9 @@
             <div>
                 <span class="section-kicker">
                     <i class="fa-solid fa-cart-flatbed"></i>
-                    Orders
+                    {{ t('admin.nav.orders', 'Orders') }}
                 </span>
-                <h2 class="mt-3 font-display text-[1.9rem] font-bold text-soil">Incoming orders</h2>
+                <h2 class="mt-3 font-display text-[1.9rem] font-bold text-soil">{{ t('farmer.incoming_orders', 'Incoming orders') }}</h2>
             </div>
 
             {% if orders %}
@@ -255,7 +252,7 @@
                             <div class="flex flex-wrap items-center gap-3">
                                 <h3 class="font-display text-[1.5rem] font-bold text-soil">{{ order.crop_name }}</h3>
                                 <span class="badge-app {% if order.status in ['Delivered'] %}badge-success{% elif order.status in ['Cancelled'] %}badge-danger{% elif order.status in ['Shipped', 'Out for Delivery'] %}badge-info{% else %}badge-warning{% endif %}">
-                                    {{ order.status }}
+                                    {{ t_status(order.status) }}
                                 </span>
                             </div>
                             <p class="mt-2 text-sm font-semibold text-ink/62">
@@ -282,28 +279,31 @@
                             <form action="{{ url_for('farmer_update_order') }}" method="POST" class="space-y-3">
                                 <input type="hidden" name="order_id" value="{{ order.id }}">
                                 <div>
-                                    <label class="field-label" for="status-{{ order.id }}">Update status</label>
+                                    <label class="field-label" for="status-{{ order.id }}">{{ t('farmer.update_status', 'Update status') }}</label>
                                     <select id="status-{{ order.id }}" class="select-shell status-select" name="status" required>
-                                        <option value="Order Confirmed">Order Confirmed</option>
-                                        <option value="Packed">Packed</option>
-                                        <option value="Shipped">Shipped</option>
-                                        <option value="Out for Delivery">Out for Delivery</option>
-                                        <option value="Delivered">Delivered</option>
+                                        {% if order.status not in ['Order Confirmed', 'Packed', 'Shipped', 'Out for Delivery', 'Delivered'] %}
+                                        <option value="" selected disabled>{{ t('farmer.current_status', 'Current:') }} {{ t_status(order.status) }}</option>
+                                        {% endif %}
+                                        <option value="Order Confirmed" {% if order.status == 'Order Confirmed' %}selected{% endif %}>{{ t_status('Order Confirmed') }}</option>
+                                        <option value="Packed" {% if order.status == 'Packed' %}selected{% endif %}>{{ t_status('Packed') }}</option>
+                                        <option value="Shipped" {% if order.status == 'Shipped' %}selected{% endif %}>{{ t_status('Shipped') }}</option>
+                                        <option value="Out for Delivery" {% if order.status == 'Out for Delivery' %}selected{% endif %}>{{ t_status('Out for Delivery') }}</option>
+                                        <option value="Delivered" {% if order.status == 'Delivered' %}selected{% endif %}>{{ t_status('Delivered') }}</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="field-label" for="location-{{ order.id }}">Current location</label>
+                                    <label class="field-label" for="location-{{ order.id }}">{{ t('customer.current_location', 'Current location:') }}</label>
                                     <input id="location-{{ order.id }}" class="input-shell" type="text" name="location"
                                         placeholder="Sorting hub, city, or delivery point">
                                 </div>
                                 <button type="submit" class="btn-primary-app w-full">
-                                    Update order
+                                    {{ t('farmer.update_order', 'Update order') }}
                                     <i class="fa-solid fa-arrow-up"></i>
                                 </button>
                             </form>
                             {% else %}
                             <div class="rounded-[1.2rem] border border-soil/10 bg-white/70 p-4 text-sm text-ink/65">
-                                This order is already finalized and no further status changes are needed.
+                                {{ t('farmer.order_finalized', 'This order is already finalized and no further status changes are needed.') }}
                             </div>
                             {% endif %}
                         </div>
@@ -313,9 +313,8 @@
             </div>
             {% else %}
             <div class="empty-state mt-6">
-                <h3 class="font-display text-[2rem] font-bold text-soil">No incoming orders yet</h3>
-                <p class="mx-auto mt-3 max-w-xl text-sm leading-6 text-ink/65 sm:text-base">Customer orders will appear
-                    here as soon as your listings begin converting.</p>
+                <h3 class="font-display text-[2rem] font-bold text-soil">{{ t('farmer.no_incoming_orders', 'No incoming orders yet') }}</h3>
+                <p class="mx-auto mt-3 max-w-xl text-sm leading-6 text-ink/65 sm:text-base">{{ t('farmer.no_incoming_orders_desc', 'Customer orders will appear here as soon as your listings begin converting.') }}</p>
             </div>
             {% endif %}
         </div>
@@ -329,6 +328,12 @@
     const categorySelect = document.getElementById('category_select');
     const suggestionText = document.getElementById('price_suggestion');
     const maxSize = 2 * 1024 * 1024;
+    const priceAdviceText = {
+        empty: {{ t('farmer.form.price_suggestion', 'Select a category for price advice.')|tojson }},
+        marketRange: {{ t('farmer.form.market_range', 'Market range:')|tojson }},
+        suggestedPrice: {{ t('farmer.form.suggested_price', 'Suggested list price:')|tojson }},
+        fileTooLarge: {{ t('farmer.form.file_too_large', 'File is too large. Maximum allowed size is 2MB.')|tojson }}
+    };
     const marketPrices = {
         'Vegetables': { min: 20, max: 60 },
         'Fruits': { min: 40, max: 200 },
@@ -350,18 +355,18 @@
         const selected = categorySelect.value;
         const range = marketPrices[selected];
         if (!range) {
-            suggestionText.textContent = 'Select a category for price advice.';
+            suggestionText.textContent = priceAdviceText.empty;
             return;
         }
 
         const suggested = Math.floor((range.min + range.max) / 2);
-        suggestionText.innerHTML = `<i class="fa-solid fa-lightbulb mr-2"></i>Market range: &#8377;${range.min} to &#8377;${range.max}. Suggested list price: &#8377;${suggested}.`;
+        suggestionText.innerHTML = `<i class="fa-solid fa-lightbulb mr-2"></i>${priceAdviceText.marketRange} &#8377;${range.min} to &#8377;${range.max}. ${priceAdviceText.suggestedPrice} &#8377;${suggested}.`;
     }
 
     fileInputs.forEach((input) => {
         input.addEventListener('change', function () {
             if (this.files && this.files[0] && this.files[0].size > maxSize) {
-                alert('File is too large. Maximum allowed size is 2MB.');
+                alert(priceAdviceText.fileTooLarge);
                 this.value = '';
             }
         });

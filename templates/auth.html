@@ -11,39 +11,55 @@
             <div>
                 <span class="section-kicker">
                     <i class="fa-solid fa-leaf"></i>
-                    {% if mode == 'login' %}Farmer-first access{% elif mode == 'verify' %}Secure sign in{% else %}Join
-                    the network{% endif %}
+                    {% if mode == 'login' %}
+                    {{ t('auth.aside.login.kicker', 'Farmer-first access') }}
+                    {% elif mode == 'verify' %}
+                    {{ t('auth.aside.verify.kicker', 'Secure sign in') }}
+                    {% elif mode == 'forgot_password' %}
+                    {{ t('auth.aside.forgot_password.kicker', 'Recover your account') }}
+                    {% elif mode == 'reset_verify' %}
+                    {{ t('auth.aside.reset_verify.kicker', 'Password reset security') }}
+                    {% elif mode == 'reset_password' %}
+                    {{ t('auth.aside.reset_password.kicker', 'Set a new password') }}
+                    {% else %}
+                    {{ t('auth.aside.register.kicker', 'Join the network') }}
+                    {% endif %}
                 </span>
                 <h1 class="mt-5 max-w-lg font-display text-3xl font-bold leading-tight text-soil sm:text-[2.7rem]">
                     {% if mode == 'login' %}
-                    Log in with your registered email and continue where your market journey left off.
+                    {{ t('auth.aside.login.title', 'Log in with your registered email and continue where your market journey left off.') }}
                     {% elif mode == 'verify' %}
-                    Complete the OTP check to unlock your Smart Farmer workspace.
+                    {{ t('auth.aside.verify.title', 'Complete the OTP check to unlock your Smart Farmer workspace.') }}
+                    {% elif mode == 'forgot_password' %}
+                    {{ t('auth.aside.forgot_password.title', 'Verify your email and reset the password securely with OTP.') }}
+                    {% elif mode == 'reset_verify' %}
+                    {{ t('auth.aside.reset_verify.title', 'Verify the reset OTP before you set a new password.') }}
+                    {% elif mode == 'reset_password' %}
+                    {{ t('auth.aside.reset_password.title', 'Choose a strong new password to get back into your account.') }}
                     {% else %}
-                    Create a modern farm marketplace identity built for trust, speed, and local reach.
+                    {{ t('auth.aside.register.title', 'Create a modern farm marketplace identity built for trust, speed, and local reach.') }}
                     {% endif %}
                 </h1>
                 <p class="mt-4 max-w-xl text-sm leading-6 text-ink/70 sm:text-base">
-                    Smart Farmer connects growers and buyers through verified listings, direct fulfillment, and clean
-                    operational dashboards for every role.
+                    {{ t('auth.aside.description', 'Smart Farmer connects growers and buyers through verified listings, direct fulfillment, and clean operational dashboards for every role.') }}
                 </p>
             </div>
 
             <div class="mt-8 grid gap-3 sm:grid-cols-3">
                 <div class="metric-card">
-                    <p class="metric-label">Email access</p>
-                    <p class="metric-value">OTP</p>
-                    <p class="mt-2 text-sm text-ink/65">Secure email-first authentication for all roles.</p>
+                    <p class="metric-label">{{ t('auth.metric.email_access.label', 'Email access') }}</p>
+                    <p class="metric-value">{{ t('auth.metric.email_access.value', 'OTP') }}</p>
+                    <p class="mt-2 text-sm text-ink/65">{{ t('auth.metric.email_access.desc', 'Secure email-first authentication for all roles.') }}</p>
                 </div>
                 <div class="metric-card">
-                    <p class="metric-label">Verified growers</p>
-                    <p class="metric-value">100%</p>
-                    <p class="mt-2 text-sm text-ink/65">Visibility tools built around farm credibility and trust.</p>
+                    <p class="metric-label">{{ t('auth.metric.verified_growers.label', 'Verified growers') }}</p>
+                    <p class="metric-value">{{ t('auth.metric.verified_growers.value', '100%') }}</p>
+                    <p class="mt-2 text-sm text-ink/65">{{ t('auth.metric.verified_growers.desc', 'Visibility tools built around farm credibility and trust.') }}</p>
                 </div>
                 <div class="metric-card">
-                    <p class="metric-label">Regional fit</p>
-                    <p class="metric-value">IN</p>
-                    <p class="mt-2 text-sm text-ink/65">India-focused marketplace copy, payments, and produce flow.</p>
+                    <p class="metric-label">{{ t('auth.metric.regional_fit.label', 'Regional fit') }}</p>
+                    <p class="metric-value">{{ t('auth.metric.regional_fit.value', 'IN') }}</p>
+                    <p class="mt-2 text-sm text-ink/65">{{ t('auth.metric.regional_fit.desc', 'India-focused marketplace copy, payments, and produce flow.') }}</p>
                 </div>
             </div>
         </div>
@@ -54,39 +70,57 @@
             <div>
                 <span class="section-kicker">
                     {% if mode == 'login' %}
-                    Sign in
+                    {{ t('auth.section.login', 'Sign in') }}
                     {% elif mode == 'verify' %}
-                    Verify OTP
+                    {{ t('auth.section.verify', 'Verify OTP') }}
+                    {% elif mode == 'forgot_password' %}
+                    {{ t('auth.section.forgot_password', 'Forgot password') }}
+                    {% elif mode == 'reset_verify' %}
+                    {{ t('auth.section.reset_verify', 'Reset OTP verification') }}
+                    {% elif mode == 'reset_password' %}
+                    {{ t('auth.section.reset_password', 'New password') }}
                     {% else %}
-                    Registration
+                    {{ t('auth.section.register', 'Registration') }}
                     {% endif %}
                 </span>
                 <h2 class="mt-3 font-display text-[1.9rem] font-bold text-soil">
                     {% if mode == 'login' %}
-                    Welcome back
+                    {{ t('auth.heading.login', 'Welcome back') }}
                     {% elif mode == 'verify' %}
-                    One more step
+                    {{ t('auth.heading.verify', 'One more step') }}
+                    {% elif mode == 'forgot_password' %}
+                    {{ t('auth.heading.forgot_password', 'Recover account access') }}
+                    {% elif mode == 'reset_verify' %}
+                    {{ t('auth.heading.reset_verify', 'Verify your inbox') }}
+                    {% elif mode == 'reset_password' %}
+                    {{ t('auth.heading.reset_password', 'Update password') }}
                     {% else %}
-                    Open your account
+                    {{ t('auth.heading.register', 'Open your account') }}
                     {% endif %}
                 </h2>
                 <p class="mt-2 text-sm leading-6 text-ink/68">
                     {% if mode == 'login' %}
-                    Use your registered email and password to continue.
+                    {{ t('auth.copy.login', 'Use your registered email and password to continue.') }}
                     {% elif mode == 'verify' %}
-                    We sent a one-time code to your inbox. Use it here before it expires.
+                    {{ t('auth.copy.verify', 'We sent a one-time code to your inbox. Use it here before it expires.') }}
+                    {% elif mode == 'forgot_password' %}
+                    {{ t('auth.copy.forgot_password', 'Enter your registered email. You will reset your password after OTP verification.') }}
+                    {% elif mode == 'reset_verify' %}
+                    {{ t('auth.copy.reset_verify', 'Verify your reset code before setting a new password.') }}
+                    {% elif mode == 'reset_password' %}
+                    {{ t('auth.copy.reset_password', 'Create a strong new password for your account.') }}
                     {% else %}
-                    Set up your buyer or farmer identity with email, profile, and region details.
+                    {{ t('auth.copy.register', 'Set up your buyer or farmer identity with email, profile, and region details.') }}
                     {% endif %}
                 </p>
             </div>
             <div
                 class="hidden h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-soil via-leaf to-grain text-white shadow-soft sm:flex">
-                <i class="fa-solid {% if mode == 'verify' %}fa-shield-halved{% elif mode == 'register' %}fa-tractor{% else %}fa-seedling{% endif %} text-xl"></i>
+                <i class="fa-solid {% if mode in ['verify', 'reset_verify'] %}fa-shield-halved{% elif mode in ['register', 'forgot_password', 'reset_password'] %}fa-key{% else %}fa-seedling{% endif %} text-xl"></i>
             </div>
         </div>
 
-        {% if mode == 'verify' %}
+        {% if mode in ['verify', 'reset_verify'] %}
         <div id="otp-alert-banner"
             class="mb-5 hidden rounded-[1.2rem] border border-[#d45b52]/20 bg-[#fff1ef] px-4 py-3 text-sm text-[#b94a42] shadow-[0_18px_40px_rgba(212,91,82,0.14)]">
             <div class="flex items-start gap-3">
@@ -94,24 +128,27 @@
                     <i class="fa-solid fa-triangle-exclamation"></i>
                 </span>
                 <div>
-                    <p class="font-bold uppercase tracking-[0.16em] text-[#b94a42]">Email delivery problem</p>
+                    <p class="font-bold uppercase tracking-[0.16em] text-[#b94a42]">{{ t('auth.delivery_issue', 'Email delivery problem') }}</p>
                     <p id="otp-alert-text" class="mt-1 leading-6 text-[#a2433d]"></p>
                 </div>
             </div>
         </div>
         {% endif %}
 
-        <form id="{% if mode == 'verify' %}verify-form{% elif mode == 'login' %}login-form{% else %}register-form{% endif %}" action="{{ url_for(mode) }}" method="POST" class="space-y-4">
+        <form id="{% if mode == 'verify' %}verify-form{% elif mode == 'login' %}login-form{% elif mode == 'forgot_password' %}forgot-form{% elif mode == 'reset_verify' %}reset-verify-form{% elif mode == 'reset_password' %}reset-password-form{% else %}register-form{% endif %}" action="{{ form_action }}" method="POST" class="space-y-4">
             {% if mode == 'login' %}
             <div>
-                <label class="field-label" for="email">Registered email</label>
+                <label class="field-label" for="email">{{ t('auth.login.email', 'Registered email') }}</label>
                 <input id="email" class="input-shell" type="email" name="email" placeholder="farmer@example.com"
                     required>
             </div>
 
             <div>
-                <label class="field-label" for="login-password">Password</label>
-                <div class="relative">
+                <div class="flex items-center justify-between gap-3">
+                    <label class="field-label mb-0" for="login-password">{{ t('auth.login.password', 'Password') }}</label>
+                    <a href="{{ url_for('forgot_password') }}" class="text-sm font-bold text-leaf">{{ t('auth.login.forgot_password', 'Forgot password?') }}</a>
+                </div>
+                <div class="relative mt-2">
                     <input id="login-password" class="input-shell pr-12" type="password" name="password"
                         placeholder="Enter your password" required>
                     <button type="button" data-password-toggle="login-password"
@@ -122,12 +159,12 @@
             </div>
 
             <button type="submit" class="btn-primary-app w-full">
-                Continue to OTP
+                {{ t('auth.login.continue', 'Continue to OTP') }}
                 <i class="fa-solid fa-arrow-right"></i>
             </button>
-            {% elif mode == 'verify' %}
+            {% elif mode in ['verify', 'reset_verify'] %}
             <div>
-                <label class="field-label" for="email_verify">Registered email</label>
+                <label class="field-label" for="email_verify">{{ t('auth.verify.email', 'Registered email') }}</label>
                 <input id="email_verify" class="input-shell bg-mist/80 text-ink/70" type="email" name="email"
                     value="{{ email }}" readonly required>
             </div>
@@ -135,8 +172,8 @@
             <div class="rounded-[1.2rem] border border-soil/10 bg-mist/70 p-4">
                 <div class="flex flex-wrap items-start justify-between gap-3">
                     <div>
-                        <p class="text-sm font-bold text-soil">Verification code</p>
-                        <p class="mt-1 text-sm text-ink/65">This code stays active for {{ otp_expiry_minutes }} minute{% if otp_expiry_minutes != 1 %}s{% endif %}. Check your inbox before requesting a new one.</p>
+                        <p class="text-sm font-bold text-soil">{{ t('auth.verify.title', 'Verification code') }}</p>
+                        <p class="mt-1 text-sm text-ink/65">{{ t('auth.verify.description', 'This code stays active for {minutes} minute{suffix}. Check your inbox before requesting a new one.', minutes=otp_expiry_minutes, suffix='' if otp_expiry_minutes == 1 else 's') }}</p>
                     </div>
                     <span class="badge-app badge-info">
                         <i class="fa-regular fa-clock"></i>
@@ -144,63 +181,118 @@
                     </span>
                 </div>
                 <div class="mt-4">
-                    <label class="field-label" for="otp_input">Enter OTP</label>
+                    <label class="field-label" for="otp_input">{{ t('auth.verify.otp_label', 'Enter OTP') }}</label>
                     <input id="otp_input" class="input-shell otp-box" type="text" name="otp" maxlength="6"
                         placeholder="000000" required disabled>
                 </div>
-                <p id="otp_status" class="mt-3 text-sm text-ink/60">Requesting your verification code...</p>
+                <p id="otp_status" class="mt-3 text-sm text-ink/60">
+                    {% if mode == 'verify' %}
+                    {{ t('auth.verify.initial_status', 'Requesting your verification code...') }}
+                    {% else %}
+                    {{ t('auth.reset_verify.initial_status', 'Requesting your password reset code...') }}
+                    {% endif %}
+                </p>
                 <button id="resend-otp-btn" type="button" class="btn-ghost-app mt-3 hidden px-0 text-sm font-bold">
                     <i class="fa-solid fa-rotate-right"></i>
-                    Resend verification code
+                    {% if mode == 'verify' %}
+                    {{ t('auth.verify.resend', 'Resend verification code') }}
+                    {% else %}
+                    {{ t('auth.reset_verify.resend', 'Resend reset code') }}
+                    {% endif %}
                 </button>
             </div>
 
             <button id="verify-submit-btn" type="submit" class="btn-primary-app w-full" disabled>
-                Complete sign in
+                {% if mode == 'verify' %}
+                {{ t('auth.verify.submit', 'Complete sign in') }}
+                {% else %}
+                {{ t('auth.reset_verify.submit', 'Verify reset OTP') }}
+                {% endif %}
                 <i class="fa-solid fa-shield-halved"></i>
+            </button>
+            {% elif mode == 'forgot_password' %}
+            <div>
+                <label class="field-label" for="forgot-email">{{ t('auth.forgot.email', 'Registered email') }}</label>
+                <input id="forgot-email" class="input-shell" type="email" name="email" placeholder="farmer@example.com" required>
+                <p class="helper-text">{{ t('auth.forgot.helper', 'Password reset email will be sent only to your registered address.') }}</p>
+            </div>
+
+            <button type="submit" class="btn-primary-app w-full">
+                {{ t('auth.forgot.submit', 'Continue to reset OTP') }}
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+            {% elif mode == 'reset_password' %}
+            <div>
+                <label class="field-label" for="reset-email">{{ t('auth.reset_password.email', 'Account email') }}</label>
+                <input id="reset-email" class="input-shell bg-mist/80 text-ink/70" type="email" value="{{ email }}" readonly required>
+            </div>
+            <div>
+                <label class="field-label" for="reset-password">{{ t('auth.reset_password.new_password', 'New password') }}</label>
+                <div class="relative">
+                    <input id="reset-password" class="input-shell pr-12" type="password" name="password" placeholder="Create a strong password" required>
+                    <button type="button" data-password-toggle="reset-password"
+                        class="absolute right-3 top-1/2 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-xl text-ink/45 transition hover:bg-mist hover:text-soil">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+            <div>
+                <label class="field-label" for="confirm-password">{{ t('auth.reset_password.confirm_password', 'Confirm new password') }}</label>
+                <div class="relative">
+                    <input id="confirm-password" class="input-shell pr-12" type="password" name="confirm_password" placeholder="Re-enter the new password" required>
+                    <button type="button" data-password-toggle="confirm-password"
+                        class="absolute right-3 top-1/2 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-xl text-ink/45 transition hover:bg-mist hover:text-soil">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-primary-app w-full">
+                {{ t('auth.reset_password.submit', 'Update password') }}
+                <i class="fa-solid fa-key"></i>
             </button>
             {% else %}
             <div class="grid gap-4 sm:grid-cols-2">
                 <div class="sm:col-span-2">
-                    <label class="field-label" for="full_name">Full name</label>
+                    <label class="field-label" for="full_name">{{ t('auth.register.full_name', 'Full name') }}</label>
                     <input id="full_name" class="input-shell" type="text" name="full_name"
                         placeholder="Mahesh Reddy" required>
                 </div>
                 <div class="sm:col-span-2">
-                    <label class="field-label" for="email_register">Email address</label>
+                    <label class="field-label" for="email_register">{{ t('auth.register.email', 'Email address') }}</label>
                     <input id="email_register" class="input-shell" type="email" name="email"
                         placeholder="mahesh@example.com" required>
                 </div>
                 <div>
-                    <label class="field-label" for="role">Joining as</label>
+                    <label class="field-label" for="role">{{ t('auth.register.role', 'Joining as') }}</label>
                     <select id="role" class="select-shell" name="role" required>
-                        <option value="customer">Customer</option>
-                        <option value="farmer">Farmer</option>
+                        <option value="customer">{{ t('auth.register.customer', 'Customer') }}</option>
+                        <option value="farmer">{{ t('auth.register.farmer', 'Farmer') }}</option>
                     </select>
                 </div>
                 <div>
-                    <label class="field-label" for="city">City</label>
+                    <label class="field-label" for="city">{{ t('auth.register.city', 'City') }}</label>
                     <input id="city" class="input-shell" type="text" name="city" placeholder="Hyderabad" required>
                 </div>
                 <div>
-                    <label class="field-label" for="state">State</label>
+                    <label class="field-label" for="state">{{ t('auth.register.state', 'State') }}</label>
                     <input id="state" class="input-shell" type="text" name="state" placeholder="Telangana">
                 </div>
                 <div>
-                    <label class="field-label" for="district">District</label>
+                    <label class="field-label" for="district">{{ t('auth.register.district', 'District') }}</label>
                     <input id="district" class="input-shell" type="text" name="district" placeholder="Nalgonda">
                 </div>
                 <div>
-                    <label class="field-label" for="pincode">Pincode</label>
+                    <label class="field-label" for="pincode">{{ t('auth.register.pincode', 'Pincode') }}</label>
                     <input id="pincode" class="input-shell" type="text" name="pincode" placeholder="500001">
                 </div>
                 <div class="sm:col-span-2">
-                    <label class="field-label" for="username">Username</label>
+                    <label class="field-label" for="username">{{ t('auth.register.username', 'Username') }}</label>
                     <input id="username" class="input-shell" type="text" name="username" placeholder="smartmahesh"
                         required>
                 </div>
                 <div class="sm:col-span-2">
-                    <label class="field-label" for="register-password">Password</label>
+                    <label class="field-label" for="register-password">{{ t('auth.register.password', 'Password') }}</label>
                     <div class="relative">
                         <input id="register-password" class="input-shell pr-12" type="password" name="password"
                             placeholder="Create a strong password" required>
@@ -213,7 +305,7 @@
             </div>
 
             <button type="submit" class="btn-primary-app w-full">
-                Create account
+                {{ t('auth.register.submit', 'Create account') }}
                 <i class="fa-solid fa-arrow-right"></i>
             </button>
             {% endif %}
@@ -221,26 +313,40 @@
 
         <div class="mt-6 rounded-[1.2rem] border border-soil/8 bg-white/60 px-4 py-3.5 text-sm text-ink/68">
             {% if mode == 'login' %}
-            New to Smart Farmer?
-            <a href="{{ url_for('register') }}" class="font-bold text-leaf">Create an account</a>
+            {{ t('auth.login.new_user', 'New to Smart Farmer?') }}
+            <a href="{{ url_for('register') }}" class="font-bold text-leaf">{{ t('auth.login.create_account', 'Create an account') }}</a>
+            {% elif mode == 'register' %}
+            {{ t('auth.register.registered', 'Already registered?') }}
+            <a href="{{ url_for('login') }}" class="font-bold text-leaf">{{ t('auth.register.sign_in', 'Go to sign in') }}</a>
+            {% elif mode == 'forgot_password' %}
+            {{ t('auth.forgot.remembered', 'Remembered your password?') }}
+            <a href="{{ url_for('login') }}" class="font-bold text-leaf">{{ t('auth.forgot.back_to_login', 'Go to sign in') }}</a>
+            {% elif mode in ['reset_verify', 'reset_password'] %}
+            {{ t('auth.reset_password.start_again', 'Need to use a different email?') }}
+            <a href="{{ url_for('forgot_password') }}" class="font-bold text-leaf">{{ t('auth.reset_password.request_again', 'Start again') }}</a>
             {% else %}
-            Already registered?
-            <a href="{{ url_for('login') }}" class="font-bold text-leaf">Go to sign in</a>
+            {{ t('auth.register.registered', 'Already registered?') }}
+            <a href="{{ url_for('login') }}" class="font-bold text-leaf">{{ t('auth.register.sign_in', 'Go to sign in') }}</a>
             {% endif %}
         </div>
     </div>
 </section>
-
-{% if mode == 'verify' %}
+{% if mode in ['verify', 'reset_verify'] %}
 <div id="otp-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-soil/45 px-4 backdrop-blur-sm">
     <div class="w-full max-w-sm rounded-[1.6rem] bg-white p-5 shadow-bloom">
         <div class="flex items-start justify-between gap-4">
             <div>
                 <span class="section-kicker">
                     <i class="fa-solid fa-envelope-open-text"></i>
-                    Inbox confirmation
+                    {{ t('auth.verify.modal.kicker', 'Inbox confirmation') }}
                 </span>
-                <h3 class="mt-3 font-display text-[1.9rem] font-bold text-soil">Verification email sent</h3>
+                <h3 class="mt-3 font-display text-[1.9rem] font-bold text-soil">
+                    {% if mode == 'verify' %}
+                    {{ t('auth.verify.modal.title', 'Verification email sent') }}
+                    {% else %}
+                    {{ t('auth.reset_verify.modal.title', 'Password reset email sent') }}
+                    {% endif %}
+                </h3>
                 <p id="otp-modal-message" class="mt-2 text-sm leading-6 text-ink/66"></p>
             </div>
             <button id="otp-modal-close" type="button"
@@ -249,19 +355,25 @@
             </button>
         </div>
         <div class="mt-5 rounded-[1.2rem] border border-soil/10 bg-mist/70 p-4 text-center">
-            <p class="text-xs font-extrabold uppercase tracking-[0.18em] text-ink/45">Email delivery</p>
+            <p class="text-xs font-extrabold uppercase tracking-[0.18em] text-ink/45">{{ t('auth.verify.modal.delivery', 'Email delivery') }}</p>
             <p id="otp-modal-code" class="mt-3 font-display text-4xl font-bold tracking-[0.14em] text-soil"></p>
         </div>
-        <p class="mt-4 text-sm text-ink/62">Use the OTP from your inbox. This dialog only confirms that the message has been sent.</p>
+        <p class="mt-4 text-sm text-ink/62">
+            {% if mode == 'verify' %}
+            {{ t('auth.verify.modal.desc', 'Use the OTP from your inbox. This dialog only confirms that the message has been sent.') }}
+            {% else %}
+            {{ t('auth.reset_verify.modal.desc', 'Continue the reset with the OTP from your inbox.') }}
+            {% endif %}
+        </p>
     </div>
 </div>
 {% endif %}
 {% endblock %}
 
 {% block scripts %}
-{% if mode == 'verify' %}
+{% if mode in ['verify', 'reset_verify'] %}
 <script>
-    const verifyForm = document.getElementById('verify-form');
+    const verifyForm = document.getElementById('{{ 'verify-form' if mode == 'verify' else 'reset-verify-form' }}');
     const emailVerifyInput = document.getElementById('email_verify');
     const timerVal = document.getElementById('timer_val');
     const otpStatus = document.getElementById('otp_status');
@@ -274,6 +386,20 @@
     const otpModalMessage = document.getElementById('otp-modal-message');
     const otpAlertBanner = document.getElementById('otp-alert-banner');
     const otpAlertText = document.getElementById('otp-alert-text');
+    const otpFlowConfig = {
+        requestUrl: {{ (url_for('request_otp') if mode == 'verify' else url_for('request_password_reset_otp'))|tojson }},
+        verifyUrl: {{ (url_for('verify') if mode == 'verify' else url_for('verify_reset_otp'))|tojson }},
+        requestMessage: {{ (t('auth.verify.requesting', 'Requesting a fresh verification code...') if mode == 'verify' else t('auth.reset_verify.requesting', 'Requesting a fresh password reset code...'))|tojson }},
+        emptyOtpMessage: {{ t('auth.verify.empty', 'Enter the 6-digit OTP to continue.')|tojson }},
+        verifyingLabel: {{ t('auth.verify.verifying', 'Verifying')|tojson }},
+        verifyButtonHtml: {{ ((t('auth.verify.submit', 'Complete sign in') if mode == 'verify' else t('auth.reset_verify.submit', 'Verify reset OTP')) ~ ' <i class="fa-solid fa-shield-halved"></i>')|tojson }},
+        requestCompleted: {{ 'Request completed.'|tojson }},
+        unexpectedResponse: {{ 'Unexpected server response. Please try again.'|tojson }},
+        fallbackDeliveryMessage: {{ t('otp.delivery_fallback', 'The server could not complete the email delivery request. Check SMTP settings and try again.')|tojson }},
+        timeoutMessage: {{ t('auth.verify.timeout', 'OTP verification timed out. Please try again.')|tojson }},
+        unavailableMessage: {{ t('auth.verify.unavailable', 'Unable to verify OTP right now. Please try again.')|tojson }},
+        modalFallbackCode: {{ 'Check inbox'|tojson }}
+    };
     let timeLeft = {{ otp_expiry_seconds }};
     let timerId = null;
     const deliveryErrorCodes = new Set([
@@ -315,8 +441,8 @@
             return {
                 success: typeof payload.success === 'boolean' ? payload.success : response.ok,
                 message: payload.message || (response.ok
-                    ? 'Request completed.'
-                    : 'Unexpected server response. Please try again.'),
+                    ? otpFlowConfig.requestCompleted
+                    : otpFlowConfig.unexpectedResponse),
                 error_code: Object.prototype.hasOwnProperty.call(payload, 'error_code')
                     ? payload.error_code
                     : (response.ok ? null : 'server_error'),
@@ -326,7 +452,7 @@
         } catch (error) {
             return {
                 success: false,
-                message: 'Unexpected server response. Please try again.',
+                message: otpFlowConfig.unexpectedResponse,
                 error_code: 'bad_response',
                 redirect: null,
                 otp: null
@@ -358,7 +484,7 @@
 
     function openOtpModal(message, otp) {
         otpModalMessage.textContent = message;
-        otpModalCode.textContent = otp || 'Check inbox';
+        otpModalCode.textContent = otp || otpFlowConfig.modalFallbackCode;
         otpModal.classList.remove('hidden');
         otpModal.classList.add('flex');
     }
@@ -393,9 +519,9 @@
         setVerifyAvailability(false);
         resendBtn.classList.add('hidden');
         setOtpAlert('', false);
-        setOtpStatus('Requesting a fresh verification code...');
+        setOtpStatus(otpFlowConfig.requestMessage);
 
-        const response = await fetchWithTimeout('/request_otp', {
+        const response = await fetchWithTimeout(otpFlowConfig.requestUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: `email=${encodeURIComponent(email)}`
@@ -419,13 +545,13 @@
 
         if (!otp) {
             setOtpAlert('', false);
-            setOtpStatus('Enter the 6-digit OTP to continue.', 'error');
+            setOtpStatus(otpFlowConfig.emptyOtpMessage, 'error');
             return;
         }
 
         setOtpAlert('', false);
         verifySubmitBtn.disabled = true;
-        verifySubmitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifying';
+        verifySubmitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ${otpFlowConfig.verifyingLabel}`;
 
         try {
             const formData = new FormData();
@@ -433,7 +559,7 @@
             formData.append('otp', otp);
             formData.append('response_mode', 'json');
 
-            const response = await fetchWithTimeout('{{ url_for("verify") }}', {
+            const response = await fetchWithTimeout(otpFlowConfig.verifyUrl, {
                 method: 'POST',
                 body: formData
             });
@@ -448,28 +574,28 @@
         } catch (error) {
             setOtpAlert('', false);
             setOtpStatus(error && error.name === 'AbortError'
-                ? 'OTP verification timed out. Please try again.'
-                : 'Unable to verify OTP right now. Please try again.', 'error');
+                ? otpFlowConfig.timeoutMessage
+                : otpFlowConfig.unavailableMessage, 'error');
         } finally {
             verifySubmitBtn.disabled = false;
-            verifySubmitBtn.innerHTML = 'Complete sign in <i class="fa-solid fa-shield-halved"></i>';
+            verifySubmitBtn.innerHTML = otpFlowConfig.verifyButtonHtml;
         }
     }
 
     setVerifyAvailability(false);
     requestOtp().catch((error) => {
-        setOtpAlert('The server could not complete the email delivery request. Check SMTP settings and try again.', true);
+        setOtpAlert(otpFlowConfig.fallbackDeliveryMessage, true);
         setOtpStatus(error && error.name === 'AbortError'
-            ? 'OTP delivery timed out. Please try again.'
-            : 'Unable to request OTP right now. Please try again.', 'error');
+            ? otpFlowConfig.timeoutMessage
+            : otpFlowConfig.unavailableMessage, 'error');
     });
     verifyForm.addEventListener('submit', submitVerify);
     resendBtn.addEventListener('click', () => {
         requestOtp().catch((error) => {
-            setOtpAlert('The server could not complete the email delivery request. Check SMTP settings and try again.', true);
+            setOtpAlert(otpFlowConfig.fallbackDeliveryMessage, true);
             setOtpStatus(error && error.name === 'AbortError'
-                ? 'OTP delivery timed out. Please try again.'
-                : 'Unable to request OTP right now. Please try again.', 'error');
+                ? otpFlowConfig.timeoutMessage
+                : otpFlowConfig.unavailableMessage, 'error');
         });
     });
     otpModalClose.addEventListener('click', closeOtpModal);

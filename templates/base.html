@@ -1,10 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ current_language }}">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f7f6f1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title>Smart Farmer Market</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Rashi+Hebrew:wght@400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='vendor/fonts/fonts.css') }}">
     <script src="{{ url_for('static', filename='vendor/tailwind/tailwindcss.js') }}"></script>
     <script>
@@ -21,8 +27,8 @@
                         clay: "#8a5c3d"
                     },
                     fontFamily: {
-                        display: ["Fraunces", "serif"],
-                        body: ["Plus Jakarta Sans", "sans-serif"]
+                        display: ["Noto Rashi Hebrew", "Noto Sans Telugu", "serif"],
+                        body: ["Plus Jakarta Sans", "Noto Sans Telugu", "Nirmala UI", "sans-serif"]
                     },
                     boxShadow: {
                         bloom: "0 24px 80px rgba(17, 40, 24, 0.12)",
@@ -37,55 +43,74 @@
     {% block extra_head %}{% endblock %}
 </head>
 
-<body class="font-body text-ink">
+<body class="font-body text-ink lang-{{ current_language }} endpoint-{{ (request.endpoint or 'unknown')|replace('.', '-') }}">
     {% set is_admin_command = request.endpoint == 'admin_dashboard' %}
+    {% set show_mobile_header_language = not session.get('user_id') %}
     <div class="page-noise"></div>
     <div class="page-radial page-radial-a"></div>
     <div class="page-radial page-radial-b"></div>
 
     {% if not is_admin_command %}
-    <header class="sticky top-0 z-40 border-b border-white/50 bg-white/80 backdrop-blur-xl">
-        <nav class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-            <a href="{{ url_for('index') }}" class="flex items-center gap-3">
-                <span
-                    class="flex h-11 w-11 items-center justify-center rounded-[1.15rem] bg-gradient-to-br from-soil via-leaf to-grain text-white shadow-soft">
+    <header class="site-header sticky top-0 z-40 border-b border-white/50 bg-white/80 backdrop-blur-xl">
+        <nav class="site-nav mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+            <a href="{{ url_for('index') }}" class="site-brand flex items-center gap-3">
+                <span class="flex h-11 w-11 items-center justify-center rounded-[1.15rem] bg-gradient-to-br from-soil via-leaf to-grain text-white shadow-soft">
                     <i class="fa-solid fa-seedling"></i>
                 </span>
                 <span>
                     <span class="block font-display text-[1.15rem] font-bold tracking-tight text-soil">Smart Farmer</span>
-                    <span class="block text-[0.65rem] font-bold uppercase tracking-[0.32em] text-leaf/70">Soil to
-                        table network</span>
+                    <span class="block text-[0.65rem] font-bold uppercase tracking-[0.32em] text-leaf/70">{{ t('brand.tagline', 'Soil to table network') }}</span>
                 </span>
             </a>
 
-            <button type="button" data-mobile-toggle data-target="primary-menu"
-                class="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-soil/10 bg-white text-soil shadow-sm transition hover:border-leaf/30 hover:text-leaf lg:hidden">
+            {% if show_mobile_header_language %}
+            <form action="{{ url_for('set_language') }}" method="POST" class="language-toggle-form site-header-language lg:hidden">
+                <input type="hidden" name="next" value="{{ request.full_path if request.query_string else request.path }}">
+                <input type="hidden" name="language" value="{{ 'te' if current_language == 'en' else 'en' }}">
+                <button type="submit" class="language-toggle-button" aria-label="{{ t('language.label', 'Language') }}" title="{{ t('language.label', 'Language') }}">
+                    <span>{{ 'En' if current_language == 'en' else 'Te' }}</span>
+                    <i class="fa-solid fa-angle-down" aria-hidden="true"></i>
+                </button>
+            </form>
+            {% else %}
+            <button type="button" data-mobile-toggle data-target="primary-menu" data-backdrop="primary-menu-backdrop"
+                aria-expanded="false" aria-controls="primary-menu"
+                class="site-menu-toggle inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-soil/10 bg-white text-soil shadow-sm transition hover:border-leaf/30 hover:text-leaf lg:hidden">
                 <i class="fa-solid fa-bars"></i>
             </button>
+            {% endif %}
 
-            <div id="primary-menu"
-                class="mobile-menu hidden lg:flex lg:items-center lg:gap-4">
+            <div id="primary-menu" class="mobile-menu hidden lg:flex lg:items-center lg:gap-4">
                 <div class="flex flex-col gap-2 rounded-[1.45rem] border border-soil/10 bg-white/95 p-4 shadow-bloom lg:flex-row lg:items-center lg:rounded-full lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none">
-                    <a href="{{ url_for('index') }}" class="nav-link">Home</a>
+                    <a href="{{ url_for('index') }}" class="nav-link">{{ t('nav.home', 'Home') }}</a>
                     {% if session.get('user_id') %}
                     {% if session.get('role') == 'farmer' %}
-                    <a href="{{ url_for('farmer_dashboard') }}" class="nav-link">Farmer Workspace</a>
+                    <a href="{{ url_for('farmer_dashboard') }}" class="nav-link">{{ t('nav.farmer_workspace', 'Farmer Workspace') }}</a>
                     {% elif session.get('role') == 'customer' %}
-                    <a href="{{ url_for('marketplace') }}" class="nav-link">Marketplace</a>
-                    <a href="{{ url_for('my_orders') }}" class="nav-link">Orders</a>
+                    <a href="{{ url_for('marketplace') }}" class="nav-link">{{ t('nav.marketplace', 'Marketplace') }}</a>
+                    <a href="{{ url_for('my_orders') }}" class="nav-link">{{ t('nav.orders', 'Orders') }}</a>
                     {% elif session.get('role') == 'admin' %}
-                    <a href="{{ url_for('admin_dashboard') }}" class="nav-link">Admin Console</a>
+                    <a href="{{ url_for('admin_dashboard') }}" class="nav-link">{{ t('nav.admin_console', 'Admin Console') }}</a>
                     {% endif %}
-                    <a href="{{ url_for('logout') }}" class="btn-outline-app">Logout</a>
+                    <a href="{{ url_for('logout') }}" class="btn-outline-app">{{ t('nav.logout', 'Logout') }}</a>
                     {% else %}
-                    <a href="{{ url_for('login') }}" class="nav-link">Login</a>
-                    <a href="{{ url_for('register') }}" class="btn-outline-app">Join</a>
-                    <a href="{{ url_for('admin_login') }}" class="btn-primary-app">Admin Access</a>
+                    <a href="{{ url_for('login') }}" class="nav-link">{{ t('nav.login', 'Login') }}</a>
+                    <a href="{{ url_for('register') }}" class="btn-outline-app">{{ t('nav.join', 'Join') }}</a>
+                    <a href="{{ url_for('admin_login') }}" class="btn-primary-app">{{ t('nav.admin_access', 'Admin Access') }}</a>
                     {% endif %}
+                    <form action="{{ url_for('set_language') }}" method="POST" class="language-toggle-form">
+                        <input type="hidden" name="next" value="{{ request.full_path if request.query_string else request.path }}">
+                        <input type="hidden" name="language" value="{{ 'te' if current_language == 'en' else 'en' }}">
+                        <button type="submit" class="language-toggle-button" aria-label="{{ t('language.label', 'Language') }}" title="{{ t('language.label', 'Language') }}">
+                            <span>{{ 'En' if current_language == 'en' else 'Te' }}</span>
+                            <i class="fa-solid fa-angle-down" aria-hidden="true"></i>
+                        </button>
+                    </form>
                 </div>
             </div>
         </nav>
     </header>
+    <div id="primary-menu-backdrop" class="mobile-menu-backdrop hidden lg:hidden" data-mobile-backdrop></div>
     {% endif %}
 
     <div class="flash-stack pointer-events-none fixed left-4 right-4 top-24 z-50 flex flex-col gap-3 md:left-auto md:right-6 md:top-28 md:w-[24rem]">
@@ -96,8 +121,7 @@
             <div class="flash-accent flash-{{ category }}"></div>
             <div class="min-w-0">
                 <p class="text-sm font-semibold text-soil">
-                    {% if category == 'success' %}Success{% elif category == 'error' %}Attention{% elif category ==
-                    'info' %}Update{% else %}Notice{% endif %}
+                    {% if category == 'success' %}{{ t('flash.success', 'Success') }}{% elif category == 'error' %}{{ t('flash.error', 'Attention') }}{% elif category == 'info' %}{{ t('flash.info', 'Update') }}{% else %}{{ t('flash.notice', 'Notice') }}{% endif %}
                 </p>
                 <p class="mt-1 text-sm text-ink/70">{{ message }}</p>
             </div>
@@ -110,36 +134,80 @@
         {% endwith %}
     </div>
 
-    <main class="{% if is_admin_command %}min-h-screen{% else %}mx-auto min-h-[calc(100vh-10rem)] max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8{% endif %}">
+    <main class="app-main {% if is_admin_command %}min-h-screen{% else %}mx-auto min-h-[calc(100vh-10rem)] max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8{% endif %}">
         {% block content %}{% endblock %}
     </main>
 
     {% if not is_admin_command %}
-    <footer class="border-t border-soil/10 bg-white/60">
-        <div
-            class="mx-auto grid max-w-7xl gap-6 px-4 py-8 text-sm text-ink/70 sm:px-6 lg:grid-cols-[1.6fr_1fr_1fr] lg:px-8">
+    <footer class="site-footer border-t border-soil/10 bg-white/60">
+        <div class="mx-auto grid max-w-7xl gap-6 px-4 py-8 text-sm text-ink/70 sm:px-6 lg:grid-cols-[1.6fr_1fr_1fr] lg:px-8">
             <div class="space-y-3">
                 <p class="font-display text-2xl font-bold text-soil">Smart Farmer</p>
-                <p class="max-w-xl">A modern agricultural marketplace built to help farmers sell with trust, speed, and
-                    direct market visibility.</p>
+                <p class="max-w-xl">{{ t('footer.description', 'A modern agricultural marketplace built to help farmers sell with trust, speed, and direct market visibility.') }}</p>
             </div>
             <div>
-                <p class="footer-label">Product</p>
+                <p class="footer-label">{{ t('footer.product', 'Product') }}</p>
                 <div class="footer-links">
-                    <a href="{{ url_for('marketplace') if session.get('user_id') else url_for('login') }}">Marketplace</a>
-                    <a href="{{ url_for('farmer_dashboard') if session.get('role') == 'farmer' else url_for('register') }}">Farmer
-                        Tools</a>
+                    <a href="{{ url_for('marketplace') if session.get('user_id') else url_for('login') }}">{{ t('nav.marketplace', 'Marketplace') }}</a>
+                    <a href="{{ url_for('farmer_dashboard') if session.get('role') == 'farmer' else url_for('register') }}">{{ t('footer.farmer_tools', 'Farmer Tools') }}</a>
                 </div>
             </div>
             <div>
-                <p class="footer-label">Access</p>
+                <p class="footer-label">{{ t('footer.access', 'Access') }}</p>
                 <div class="footer-links">
-                    <a href="{{ url_for('login') }}">Customer Login</a>
-                    <a href="{{ url_for('admin_login') }}">Admin Access</a>
+                    <a href="{{ url_for('login') }}">{{ t('footer.customer_login', 'Customer Login') }}</a>
+                    <a href="{{ url_for('admin_login') }}">{{ t('nav.admin_access', 'Admin Access') }}</a>
                 </div>
             </div>
         </div>
     </footer>
+
+    <nav class="mobile-nav-dock lg:hidden" aria-label="Primary">
+        {% if session.get('user_id') and session.get('role') == 'farmer' %}
+        <a href="{{ url_for('farmer_dashboard') }}" class="mobile-nav-link {% if request.endpoint == 'farmer_dashboard' %}is-active{% endif %}">
+            <i class="fa-solid fa-tractor"></i>
+            <span>{{ t('nav.farmer_workspace', 'Workspace') }}</span>
+        </a>
+        <a href="{{ url_for('index') }}" class="mobile-nav-link {% if request.endpoint == 'index' %}is-active{% endif %}">
+            <i class="fa-solid fa-house"></i>
+            <span>{{ t('nav.home', 'Home') }}</span>
+        </a>
+        <a href="{{ url_for('logout') }}" class="mobile-nav-link">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>{{ t('nav.logout', 'Logout') }}</span>
+        </a>
+        {% elif session.get('user_id') and session.get('role') == 'customer' %}
+        <a href="{{ url_for('marketplace') }}" class="mobile-nav-link {% if request.endpoint == 'marketplace' %}is-active{% endif %}">
+            <i class="fa-solid fa-store"></i>
+            <span>{{ t('nav.marketplace', 'Market') }}</span>
+        </a>
+        <a href="{{ url_for('my_orders') }}" class="mobile-nav-link {% if request.endpoint == 'my_orders' %}is-active{% endif %}">
+            <i class="fa-solid fa-bag-shopping"></i>
+            <span>{{ t('nav.orders', 'Orders') }}</span>
+        </a>
+        <a href="{{ url_for('logout') }}" class="mobile-nav-link">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>{{ t('nav.logout', 'Logout') }}</span>
+        </a>
+        {% else %}
+        <a href="{{ url_for('index') }}" class="mobile-nav-link {% if request.endpoint == 'index' %}is-active{% endif %}">
+            <i class="fa-solid fa-house"></i>
+            <span>{{ t('nav.home', 'Home') }}</span>
+        </a>
+        <a href="{{ url_for('login') }}" class="mobile-nav-link {% if request.endpoint in ['login', 'verify', 'forgot_password', 'verify_reset_otp', 'reset_password'] %}is-active{% endif %}">
+            <i class="fa-solid fa-user"></i>
+            <span>{{ t('nav.login', 'Login') }}</span>
+        </a>
+        <a href="{{ url_for('register') }}" class="mobile-nav-link {% if request.endpoint == 'register' %}is-active{% endif %}">
+            <i class="fa-solid fa-user-plus"></i>
+            <span>{{ t('nav.join', 'Join') }}</span>
+        </a>
+        <a href="{{ url_for('admin_login') }}" class="mobile-nav-link {% if request.endpoint == 'admin_login' %}is-active{% endif %}">
+            <i class="fa-solid fa-shield-halved"></i>
+            <span>{{ t('nav.admin_access', 'Admin') }}</span>
+        </a>
+        {% endif %}
+    </nav>
     {% endif %}
 
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>

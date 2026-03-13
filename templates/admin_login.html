@@ -8,32 +8,31 @@
             <div>
                 <span class="section-kicker">
                     <i class="fa-solid fa-shield-halved"></i>
-                    Admin control layer
+                    {{ t('admin_login.aside.kicker', 'Admin control layer') }}
                 </span>
                 <h1 class="mt-5 max-w-xl font-display text-3xl font-bold leading-tight text-soil sm:text-[2.7rem]">
-                    Operate the Smart Farmer network through a secure control room.
+                    {{ t('admin_login.aside.title', 'Operate the Smart Farmer network through a secure control room.') }}
                 </h1>
                 <p class="mt-4 max-w-lg text-sm leading-6 text-ink/70 sm:text-base">
-                    Review farmer verification, monitor live orders, and manage the full marketplace command surface
-                    with OTP-gated email access.
+                    {{ t('admin_login.aside.description', 'Review farmer verification, monitor live orders, and manage the full marketplace command surface with OTP-gated email access.') }}
                 </p>
             </div>
 
             <div class="mt-8 grid gap-3 sm:grid-cols-3">
                 <div class="metric-card">
-                    <p class="metric-label">Security mode</p>
-                    <p class="metric-value">Email</p>
-                    <p class="mt-2 text-sm text-ink/65">Admin sign in uses email, password, and a time-bound OTP.</p>
+                    <p class="metric-label">{{ t('admin_login.metric.security_mode.label', 'Security mode') }}</p>
+                    <p class="metric-value">{{ t('admin_login.metric.security_mode.value', 'Email') }}</p>
+                    <p class="mt-2 text-sm text-ink/65">{{ t('admin_login.metric.security_mode.description', 'Admin sign in uses email, password, and a time-bound OTP.') }}</p>
                 </div>
                 <div class="metric-card">
-                    <p class="metric-label">Market view</p>
-                    <p class="metric-value">360</p>
-                    <p class="mt-2 text-sm text-ink/65">Unified visibility over farmers, listings, and order health.</p>
+                    <p class="metric-label">{{ t('admin_login.metric.market_view.label', 'Market view') }}</p>
+                    <p class="metric-value">{{ t('admin_login.metric.market_view.value', '360') }}</p>
+                    <p class="mt-2 text-sm text-ink/65">{{ t('admin_login.metric.market_view.description', 'Unified visibility over farmers, listings, and order health.') }}</p>
                 </div>
                 <div class="metric-card">
-                    <p class="metric-label">Ops tone</p>
-                    <p class="metric-value">Live</p>
-                    <p class="mt-2 text-sm text-ink/65">Brand-aligned control room with operational clarity.</p>
+                    <p class="metric-label">{{ t('admin_login.metric.ops_tone.label', 'Ops tone') }}</p>
+                    <p class="metric-value">{{ t('admin_login.metric.ops_tone.value', 'Live') }}</p>
+                    <p class="mt-2 text-sm text-ink/65">{{ t('admin_login.metric.ops_tone.description', 'Brand-aligned control room with operational clarity.') }}</p>
                 </div>
             </div>
         </div>
@@ -43,11 +42,11 @@
         <div class="mb-6">
             <span class="section-kicker">
                 <i class="fa-solid fa-lock"></i>
-                Secure admin access
+                {{ t('admin_login.form.kicker', 'Secure admin access') }}
             </span>
-            <h2 class="mt-3 font-display text-[1.9rem] font-bold text-soil">Enter the control room</h2>
+            <h2 class="mt-3 font-display text-[1.9rem] font-bold text-soil">{{ t('admin_login.form.title', 'Enter the control room') }}</h2>
             <p class="mt-2 text-sm leading-6 text-ink/68">
-                Use admin email and password first. Once validated, the OTP step will appear without leaving this screen.
+                {{ t('admin_login.form.description', 'Use admin email and password first. Once validated, the OTP step will appear without leaving this screen.') }}
             </p>
         </div>
 
@@ -58,7 +57,7 @@
                     <i class="fa-solid fa-triangle-exclamation"></i>
                 </span>
                 <div>
-                    <p class="font-bold uppercase tracking-[0.16em] text-[#b94a42]">Email delivery problem</p>
+                    <p class="font-bold uppercase tracking-[0.16em] text-[#b94a42]">{{ t('admin_login.alert.title', 'Email delivery problem') }}</p>
                     <p id="admin-alert-text" class="mt-1 leading-6 text-[#a2433d]"></p>
                 </div>
             </div>
@@ -67,15 +66,15 @@
         <form id="admin-login-form" class="space-y-4">
             <div id="credentials-section" class="space-y-4">
                 <div>
-                    <label class="field-label" for="email">Admin email</label>
+                    <label class="field-label" for="email">{{ t('admin_login.email.label', 'Admin email') }}</label>
                     <input id="email" class="input-shell" type="email" autocomplete="username"
-                        placeholder="admin@example.com" required>
+                        placeholder="{{ t('admin_login.email.placeholder', 'admin@example.com') }}" required>
                 </div>
                 <div>
-                    <label class="field-label" for="password">Admin password</label>
+                    <label class="field-label" for="password">{{ t('admin_login.password.label', 'Admin password') }}</label>
                     <div class="relative">
                         <input id="password" class="input-shell pr-12" type="password" autocomplete="current-password"
-                            placeholder="Enter admin password" required>
+                            placeholder="{{ t('admin_login.password.placeholder', 'Enter admin password') }}" required>
                         <button type="button" data-password-toggle="password"
                             class="absolute right-3 top-1/2 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-xl text-ink/45 transition hover:bg-mist hover:text-soil">
                             <i class="fa-solid fa-eye"></i>
@@ -83,18 +82,18 @@
                     </div>
                 </div>
                 <button type="button" id="btn-send" class="btn-primary-app w-full">
-                    Validate credentials
+                    {{ t('admin_login.send.button', 'Validate credentials') }}
                     <i class="fa-solid fa-arrow-right"></i>
                 </button>
             </div>
 
-            <p id="admin-status" class="text-sm text-ink/65">Enter your admin credentials to receive an OTP.</p>
+            <p id="admin-status" class="text-sm text-ink/65">{{ t('admin_login.status.initial', 'Enter your admin credentials to receive an OTP.') }}</p>
 
             <div id="otp-section" class="hidden space-y-4 rounded-[1.2rem] border border-soil/10 bg-mist/70 p-4">
                 <div class="flex items-start justify-between gap-3">
                     <div>
-                        <p class="text-sm font-bold text-soil">One-time security code</p>
-                        <p class="mt-1 text-sm text-ink/65">The OTP was emailed to the configured admin inbox. It stays valid for {{ otp_expiry_minutes }} minute{% if otp_expiry_minutes != 1 %}s{% endif %}.</p>
+                        <p class="text-sm font-bold text-soil">{{ t('admin_login.otp.title', 'One-time security code') }}</p>
+                        <p class="mt-1 text-sm text-ink/65">{{ t('admin_login.otp.description', 'The OTP was emailed to the configured admin inbox. It stays valid for {minutes} minute{suffix}.', minutes=otp_expiry_minutes, suffix='' if otp_expiry_minutes == 1 else 's') }}</p>
                     </div>
                     <span class="badge-app badge-info">
                         <i class="fa-regular fa-clock"></i>
@@ -103,26 +102,26 @@
                 </div>
 
                 <div>
-                    <label class="field-label" for="otp">Verification code</label>
-                    <input id="otp" class="input-shell otp-box" type="text" maxlength="6" placeholder="000000">
+                    <label class="field-label" for="otp">{{ t('admin_login.otp.label', 'Verification code') }}</label>
+                    <input id="otp" class="input-shell otp-box" type="text" maxlength="6" placeholder="{{ t('admin_login.otp.placeholder', '000000') }}">
                 </div>
 
                 <div class="flex flex-col gap-3 sm:flex-row">
                     <button type="button" id="btn-verify" class="btn-primary-app flex-1">
-                        Verify and enter
+                        {{ t('admin_login.verify.button', 'Verify and enter') }}
                         <i class="fa-solid fa-shield-halved"></i>
                     </button>
                     <button type="button" id="btn-resend" class="btn-outline-app hidden flex-1">
                         <i class="fa-solid fa-rotate-right"></i>
-                        Resend OTP
+                        {{ t('admin_login.resend.button', 'Resend OTP') }}
                     </button>
                 </div>
             </div>
         </form>
 
         <div class="mt-6 rounded-[1.2rem] border border-soil/8 bg-white/60 px-4 py-3.5 text-sm text-ink/68">
-            Need customer or farmer access instead?
-            <a href="{{ url_for('index') }}" class="font-bold text-leaf">Return to marketplace</a>
+            {{ t('admin_login.footer.prompt', 'Need customer or farmer access instead?') }}
+            <a href="{{ url_for('index') }}" class="font-bold text-leaf">{{ t('admin_login.footer.link', 'Return to marketplace') }}</a>
         </div>
     </div>
 </section>
@@ -133,9 +132,9 @@
             <div>
                 <span class="section-kicker">
                     <i class="fa-solid fa-envelope-open-text"></i>
-                    Inbox confirmation
+                    {{ t('admin_login.modal.kicker', 'Inbox confirmation') }}
                 </span>
-                <h3 class="mt-3 font-display text-[1.9rem] font-bold text-soil">Admin verification email sent</h3>
+                <h3 class="mt-3 font-display text-[1.9rem] font-bold text-soil">{{ t('admin_login.modal.title', 'Admin verification email sent') }}</h3>
                 <p id="admin-otp-message" class="mt-2 text-sm leading-6 text-ink/66"></p>
             </div>
             <button id="admin-otp-modal-close" type="button"
@@ -144,10 +143,10 @@
             </button>
         </div>
         <div class="mt-5 rounded-[1.2rem] border border-soil/10 bg-mist/70 p-4 text-center">
-            <p class="text-xs font-extrabold uppercase tracking-[0.18em] text-ink/45">Email delivery</p>
+            <p class="text-xs font-extrabold uppercase tracking-[0.18em] text-ink/45">{{ t('admin_login.modal.delivery', 'Email delivery') }}</p>
             <p id="admin-otp-code" class="mt-3 font-display text-4xl font-bold tracking-[0.14em] text-soil"></p>
         </div>
-        <p class="mt-4 text-sm text-ink/62">Use the OTP from the admin inbox. This dialog only confirms that the message has been sent.</p>
+        <p class="mt-4 text-sm text-ink/62">{{ t('admin_login.modal.description', 'Use the OTP from the admin inbox. This dialog only confirms that the message has been sent.') }}</p>
     </div>
 </div>
 {% endblock %}
@@ -179,6 +178,24 @@
         'invalid_email_domain'
     ]);
 
+    const copy = {
+        sendButton: {{ t('admin_login.send.button', 'Validate credentials')|tojson }},
+        verifyButton: {{ t('admin_login.verify.button', 'Verify and enter')|tojson }},
+        sendLoading: {{ t('admin_login.send.loading', 'Checking credentials')|tojson }},
+        verifyLoading: {{ t('admin_login.verify.loading', 'Verifying')|tojson }},
+        requestCompleted: {{ t('admin_login.js.request_completed', 'Request completed.')|tojson }},
+        badResponse: {{ t('admin_login.js.bad_response', 'Unexpected server response. Please try again.')|tojson }},
+        emptyCredentials: {{ t('admin_login.js.empty_credentials', 'Admin email and password are required.')|tojson }},
+        timeoutCredentials: {{ t('admin_login.js.timeout_credentials', 'Credential validation timed out. Please try again.')|tojson }},
+        credentialsUnavailable: {{ t('admin_login.js.credentials_unavailable', 'Unable to validate credentials right now.')|tojson }},
+        deliveryFailure: {{ t('admin_login.js.delivery_failure', 'The server could not complete the email delivery request. Check SMTP settings and try again.')|tojson }},
+        emptyOtp: {{ t('admin_login.js.empty_otp', 'Enter the 6-digit OTP to continue.')|tojson }},
+        processing: {{ t('admin_login.js.processing', 'Processing...')|tojson }},
+        timeoutOtp: {{ t('admin_login.js.timeout_otp', 'OTP verification timed out. Please try again.')|tojson }},
+        otpUnavailable: {{ t('admin_login.js.otp_unavailable', 'Unable to verify OTP right now.')|tojson }},
+        inboxFallback: {{ t('admin_login.modal.inbox_fallback', 'Check inbox')|tojson }}
+    };
+
     function setStatus(message, tone = 'neutral') {
         statusText.textContent = message;
         statusText.classList.remove('text-ink/65', 'text-leaf', 'text-[#c2524a]');
@@ -198,12 +215,12 @@
 
     function resetSendButton() {
         sendBtn.disabled = false;
-        sendBtn.innerHTML = 'Validate credentials <i class="fa-solid fa-arrow-right"></i>';
+        sendBtn.innerHTML = `${copy.sendButton} <i class="fa-solid fa-arrow-right"></i>`;
     }
 
     function resetVerifyButton() {
         verifyBtn.disabled = false;
-        verifyBtn.innerHTML = 'Verify and enter <i class="fa-solid fa-shield-halved"></i>';
+        verifyBtn.innerHTML = `${copy.verifyButton} <i class="fa-solid fa-shield-halved"></i>`;
     }
 
     async function readJsonResponse(response) {
@@ -211,9 +228,7 @@
             const payload = await response.json();
             return {
                 success: typeof payload.success === 'boolean' ? payload.success : response.ok,
-                message: payload.message || (response.ok
-                    ? 'Request completed.'
-                    : 'Unexpected server response. Please try again.'),
+                message: payload.message || (response.ok ? copy.requestCompleted : copy.badResponse),
                 error_code: Object.prototype.hasOwnProperty.call(payload, 'error_code')
                     ? payload.error_code
                     : (response.ok ? null : 'server_error'),
@@ -223,7 +238,7 @@
         } catch (error) {
             return {
                 success: false,
-                message: 'Unexpected server response. Please try again.',
+                message: copy.badResponse,
                 error_code: 'bad_response',
                 redirect: null,
                 otp: null
@@ -255,7 +270,7 @@
 
     function openOtpModal(message, otp) {
         otpModalMessage.textContent = message;
-        otpModalCode.textContent = otp || 'Check inbox';
+        otpModalCode.textContent = otp || copy.inboxFallback;
         otpModal.classList.remove('hidden');
         otpModal.classList.add('flex');
     }
@@ -287,13 +302,13 @@
 
         if (!email || !password) {
             setAlert('', false);
-            setStatus('Admin email and password are required.', 'error');
+            setStatus(copy.emptyCredentials, 'error');
             return;
         }
 
         setAlert('', false);
         sendBtn.disabled = true;
-        sendBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Checking credentials';
+        sendBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ${copy.sendLoading}`;
 
         try {
             const formData = new FormData();
@@ -318,10 +333,8 @@
                 return;
             }
         } catch (error) {
-            setAlert('The server could not complete the email delivery request. Check SMTP settings and try again.', true);
-            setStatus(error && error.name === 'AbortError'
-                ? 'Credential validation timed out. Please try again.'
-                : 'Unable to validate credentials right now.', 'error');
+            setAlert(copy.deliveryFailure, true);
+            setStatus(error && error.name === 'AbortError' ? copy.timeoutCredentials : copy.credentialsUnavailable, 'error');
         } finally {
             if (!otpSection.classList.contains('hidden')) {
                 return;
@@ -337,13 +350,13 @@
 
         if (!otp) {
             setAlert('', false);
-            setStatus('Enter the 6-digit OTP to continue.', 'error');
+            setStatus(copy.emptyOtp, 'error');
             return;
         }
 
         setAlert('', false);
         verifyBtn.disabled = true;
-        verifyBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifying';
+        verifyBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ${copy.verifyLoading}`;
 
         try {
             const formData = new FormData();
@@ -359,7 +372,7 @@
 
             const result = await readJsonResponse(response);
             setAlert(result.message, isDeliveryFailure(result, response));
-            setStatus(result.message || 'Processing...', result.success ? 'success' : 'error');
+            setStatus(result.message || copy.processing, result.success ? 'success' : 'error');
 
             if (response.ok && result.success) {
                 window.location.href = result.redirect;
@@ -367,9 +380,7 @@
             }
         } catch (error) {
             setAlert('', false);
-            setStatus(error && error.name === 'AbortError'
-                ? 'OTP verification timed out. Please try again.'
-                : 'Unable to verify OTP right now.', 'error');
+            setStatus(error && error.name === 'AbortError' ? copy.timeoutOtp : copy.otpUnavailable, 'error');
         } finally {
             resetVerifyButton();
         }
